@@ -14,6 +14,8 @@
     "@mantine/hooks": "^7.17.4",
     "@mantine/modals": "^7.17.4",
     "@mantine/notifications": "^7.17.4",
+    "@supabase/ssr": "^0.6.1",
+    "@supabase/supabase-js": "^2.49.4",
     "i18next": "^25.0.1",
     "mantine-form-zod-resolver": "^1.1.0",
     "next": "15.3.1",
