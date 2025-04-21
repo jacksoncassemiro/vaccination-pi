@@ -6,7 +6,7 @@ import { ReactNode } from "react";
 import "@mantine/core/styles.css";
 import "@mantine/notifications/styles.css";
 
-export const AllMantineProviders = ({ children }: { children: ReactNode }) => {
+export const MantineAllProviders = ({ children }: { children: ReactNode }) => {
 	return (
 		<MantineProvider defaultColorScheme="dark" theme={theme}>
 			<ModalsProvider>

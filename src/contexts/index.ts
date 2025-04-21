@@ -1,1 +1,1 @@
-export * from "./allMantineProviders";
+export * from "./mantineAllProviders";

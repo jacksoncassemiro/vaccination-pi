@@ -2,7 +2,7 @@ import { getBaseUrl } from "@/utils";
 import type { Metadata } from "next";
 import { ColorSchemeScript, mantineHtmlProps } from "@mantine/core";
 import "../styles/globals.css";
-import { AllMantineProviders } from "@/contexts";
+import { MantineAllProviders } from "@/contexts";
 
 export const metadata: Metadata = {
 	metadataBase: new URL(getBaseUrl()),
@@ -22,7 +22,7 @@ export default function RootLayout({
 				<ColorSchemeScript defaultColorScheme="dark" />
 			</head>
 			<body>
-				<AllMantineProviders>{children}</AllMantineProviders>
+				<MantineAllProviders>{children}</MantineAllProviders>
 			</body>
 		</html>
 	);
