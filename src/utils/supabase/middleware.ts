@@ -34,18 +34,20 @@ export const updateSession = async (request: NextRequest) => {
 	// Isso atualizará a sessão se expirar - necessário para componentes do servidor
 	// https://supabase.com/docs/guides/auth/server-side/nextjs
 	const user = await supabase.auth.getUser();
+	// Rotas públicas que não precisam de autenticação
+	const publicRoutes = ["/auth", "/auth/callback", "/auth/confirm"];
+	const isPublicRoute = publicRoutes.some((route) =>
+		pathname.startsWith(route)
+	);
 
-	// rotas protegidas
-	// if (
-	// 	pathname.startsWith("/protected") && user.error
-	// ) {
-	// 	const redirectUrl = new URL("/login", request.url);
-	// 	redirectUrl.searchParams.set("redirect", "Você precisa de permissão para prosseguir ou sua sessão expirou.");
-	// 	return NextResponse.redirect(redirectUrl);
-	// }
+	// Se o usuário não está logado e não está em uma rota pública, redireciona para login
+	if (user.error && !isPublicRoute) {
+		const redirectUrl = new URL("/auth", request.url);
+		return NextResponse.redirect(redirectUrl);
+	}
 
-	// retorna para página inicial se estiver logado e tentar acessar a página de login e criar conta
-	if (!user.error && (pathname === "/login" || pathname === "/criar-conta")) {
+	// Se o usuário está logado e tenta acessar a página de auth, redireciona para página inicial
+	if (!user.error && pathname === "/auth") {
 		const redirectUrl = new URL("/", request.url);
 		return NextResponse.redirect(redirectUrl);
 	}
