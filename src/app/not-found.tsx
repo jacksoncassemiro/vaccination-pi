@@ -4,7 +4,7 @@ import Link from "next/link";
 
 export default function NotFound() {
 	return (
-		<Container size="sm" style={{ paddingTop: "2rem" }}>
+		<Container size="md" style={{ paddingTop: "2rem" }}>
 			<Stack align="center" gap="lg">
 				<Title
 					order={1}

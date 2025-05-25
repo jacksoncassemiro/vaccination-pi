@@ -1,7 +1,13 @@
 "use client";
 
 import { useAuth } from "@/contexts";
-import { AppShell, Group, Text, UnstyledButton } from "@mantine/core";
+import {
+	AppShell,
+	Container,
+	Group,
+	Text,
+	UnstyledButton,
+} from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { ReactNode } from "react";
 import { Logo } from "./Logo";
@@ -19,29 +25,36 @@ export function AppLayout({ children, showUserMenu = true }: AppLayoutProps) {
 	const handleTitleClick = () => {
 		router.push("/");
 	};
-
 	return (
 		<AppShell header={{ height: 60 }} padding="md">
 			<AppShell.Header>
-				<Group h="100%" px="md" justify="space-between" align="center">
-					{/* Logo e Nome do Sistema */}
-					<Group gap="sm" align="center">
-						<Logo size={32} clickable />
-						<UnstyledButton onClick={handleTitleClick}>
-							<Text size="lg" fw={600} c="var(--mantine-primary-color-filled)">
-								VacinaPI
-							</Text>
-						</UnstyledButton>
-					</Group>
+				<Container size="md" h="100%">
+					<Group h="100%" justify="space-between" align="center">
+						{/* Logo e Nome do Sistema */}
+						<Group gap="sm" align="center">
+							<Logo size={32} clickable />
+							<UnstyledButton onClick={handleTitleClick}>
+								<Text
+									size="lg"
+									fw={600}
+									c="var(--mantine-primary-color-filled)"
+								>
+									VacinaPI
+								</Text>
+							</UnstyledButton>
+						</Group>
 
-					{/* Controles do Header */}
-					<Group gap="sm" align="center">
-						{showUserMenu && user && <UserMenu />}
+						{/* Controles do Header */}
+						<Group gap="sm" align="center">
+							{showUserMenu && user && <UserMenu />}
+						</Group>
 					</Group>
-				</Group>
+				</Container>
 			</AppShell.Header>
 
-			<AppShell.Main>{children}</AppShell.Main>
+			<AppShell.Main>
+				<Container size="md">{children}</Container>
+			</AppShell.Main>
 		</AppShell>
 	);
 }

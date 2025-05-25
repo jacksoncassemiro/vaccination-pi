@@ -10,7 +10,7 @@ export function LoadingScreen({
 	height = "50vh",
 }: LoadingScreenProps) {
 	return (
-		<Container size="sm" py="xl">
+		<Container size="md" py="xl">
 			<Center h={height}>
 				<Stack gap="md" align="center">
 					<Loader size="lg" />

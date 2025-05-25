@@ -17,7 +17,7 @@ export default function Error({
 	}, [error]);
 
 	return (
-		<Container size="sm" style={{ paddingTop: "2rem" }}>
+		<Container size="md" style={{ paddingTop: "2rem" }}>
 			<Stack align="center" gap="lg">
 				<AlertTriangle size={64} color="red" />
 				<Title order={2} ta="center">
