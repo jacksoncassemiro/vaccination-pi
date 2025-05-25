@@ -1,5 +1,6 @@
 "use client";
 
+import { signOut } from "@/app/auth/actions";
 import { useAuth } from "@/contexts";
 import { Avatar, Group, Text, UnstyledButton } from "@mantine/core";
 import { LogOut } from "lucide-react";
@@ -9,7 +10,7 @@ interface UserMenuProps {
 }
 
 export function UserMenu({ className }: UserMenuProps) {
-	const { user, signOut } = useAuth();
+	const { user } = useAuth();
 
 	if (!user) return null;
 
@@ -25,7 +26,6 @@ export function UserMenu({ className }: UserMenuProps) {
 						user.email ||
 						"U")[0].toUpperCase()}
 				</Avatar>
-
 				<div style={{ flex: 1 }}>
 					<Text size="sm" fw={500}>
 						{user.user_metadata?.full_name || "Usuário"}
@@ -33,11 +33,12 @@ export function UserMenu({ className }: UserMenuProps) {
 					<Text size="xs" c="dimmed">
 						{user.email}
 					</Text>
-				</div>
-
-				<UnstyledButton onClick={signOut} p="xs">
-					<LogOut size={16} />
-				</UnstyledButton>
+				</div>{" "}
+				<form action={signOut} style={{ display: "inline" }}>
+					<UnstyledButton type="submit" p="xs">
+						<LogOut size={16} />
+					</UnstyledButton>
+				</form>
 			</Group>
 		</div>
 	);

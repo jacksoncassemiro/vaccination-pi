@@ -2,7 +2,6 @@
 
 import { LoadingScreen } from "@/components";
 import { useAuth } from "@/contexts";
-import { browserClient } from "@/utils/supabase/client";
 import {
 	Button,
 	Center,
@@ -12,44 +11,11 @@ import {
 	Text,
 	Title,
 } from "@mantine/core";
-import { notifications } from "@mantine/notifications";
 import { Chrome } from "lucide-react";
-import { useState } from "react";
+import { signInWithGoogle } from "./actions";
 
 export default function AuthPage() {
-	const [loading, setLoading] = useState(false);
 	const { loading: authLoading } = useAuth();
-	const supabase = browserClient();
-
-	const handleGoogleSignIn = async () => {
-		try {
-			setLoading(true);
-
-			const { error } = await supabase.auth.signInWithOAuth({
-				provider: "google",
-				options: {
-					redirectTo: `${window.location.origin}/auth/callback`,
-				},
-			});
-
-			if (error) {
-				notifications.show({
-					title: "Erro na autenticação",
-					message: error.message,
-					color: "red",
-				});
-			}
-		} catch (error) {
-			console.error("Erro:", error);
-			notifications.show({
-				title: "Erro inesperado",
-				message: "Ocorreu um erro ao tentar fazer login. Tente novamente.",
-				color: "red",
-			});
-		} finally {
-			setLoading(false);
-		}
-	};
 
 	if (authLoading) {
 		return <LoadingScreen />;
@@ -70,22 +36,21 @@ export default function AuthPage() {
 						<Stack gap="md">
 							<Title order={2} ta="center" size="h3">
 								Entrar ou Criar Conta
-							</Title>
-
+							</Title>{" "}
 							<Text ta="center" c="dimmed" size="sm">
 								Use sua conta do Google para acessar o sistema
 							</Text>
-
-							<Button
-								fullWidth
-								leftSection={<Chrome size={18} />}
-								variant="default"
-								onClick={handleGoogleSignIn}
-								loading={loading}
-								size="md"
-							>
-								Continuar com Google
-							</Button>
+							<form action={signInWithGoogle}>
+								<Button
+									fullWidth
+									leftSection={<Chrome size={18} />}
+									variant="default"
+									type="submit"
+									size="md"
+								>
+									Continuar com Google
+								</Button>
+							</form>
 						</Stack>
 
 						<Text ta="center" c="dimmed" size="xs">

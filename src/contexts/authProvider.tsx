@@ -80,24 +80,9 @@ export function AuthProvider({ children }: AuthProviderProps) {
 		};
 	}, [initialized, supabase.auth, router]);
 
-	const signOut = async () => {
-		try {
-			setLoading(true);
-			const { error } = await supabase.auth.signOut();
-			if (error) {
-				console.error("Erro ao fazer logout:", error);
-			}
-		} catch (error) {
-			console.error("Erro inesperado ao fazer logout:", error);
-		} finally {
-			setLoading(false);
-		}
-	};
-
 	const value: AuthContextType = {
 		user,
 		loading,
-		signOut,
 	};
 
 	return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
