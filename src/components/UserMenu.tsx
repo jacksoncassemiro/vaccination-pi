@@ -2,9 +2,8 @@
 
 import { signOut } from "@/app/auth/actions";
 import { useAuth } from "@/contexts";
-import { Avatar, Group, Text, UnstyledButton } from "@mantine/core";
+import { Avatar, Group, Text, Tooltip, UnstyledButton } from "@mantine/core";
 import { LogOut } from "lucide-react";
-import { ThemeToggle } from "./ThemeToggle";
 
 interface UserMenuProps {
 	className?: string;
@@ -36,12 +35,12 @@ export function UserMenu({ className }: UserMenuProps) {
 					</Text>
 				</div>
 
-				<ThemeToggle size="sm" variant="subtle" />
-
 				<form action={signOut} style={{ display: "inline" }}>
-					<UnstyledButton type="submit" p="xs">
-						<LogOut size={16} />
-					</UnstyledButton>
+					<Tooltip label="Sair">
+						<UnstyledButton type="submit" p="xs">
+							<LogOut size={16} />
+						</UnstyledButton>
+					</Tooltip>
 				</form>
 			</Group>
 		</div>

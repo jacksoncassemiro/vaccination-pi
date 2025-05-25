@@ -1,6 +1,6 @@
 "use client";
 
-import { LoadingScreen, UserMenu } from "@/components";
+import { AppLayout, LoadingScreen } from "@/components";
 import { useAuth } from "@/contexts";
 import { useColorScheme } from "@/hooks";
 import {
@@ -22,44 +22,40 @@ export default function HomePage() {
 	}
 
 	return (
-		<Container size="sm" py="xl">
-			<Stack gap="lg">
-				<Group justify="space-between" align="center">
-					<Title ta="center" order={1}>
-						VacinaPI
-					</Title>
-					<UserMenu />
-				</Group>
+		<AppLayout>
+			<Container size="sm" py="xl">
+				<Stack gap="lg">
+					{" "}
+					<Paper p="xl" radius="md" withBorder>
+						<Stack gap="md">
+							<Title order={2} ta="center">
+								Bem-vindo!
+							</Title>
 
-				<Paper p="xl" radius="md" withBorder>
-					<Stack gap="md">
-						<Title order={2} ta="center">
-							Bem-vindo!
-						</Title>
+							{user && (
+								<Text ta="center" c="dimmed">
+									Olá, {user.user_metadata?.full_name || user.email}!
+								</Text>
+							)}
 
-						{user && (
-							<Text ta="center" c="dimmed">
-								Olá, {user.user_metadata?.full_name || user.email}!
+							<Text ta="center">
+								Sistema de gestão de vacinação para o curso de Sistemas para
+								Internet da UNCISAL.
 							</Text>
-						)}
 
-						<Text ta="center">
-							Sistema de gestão de vacinação para o curso de Sistemas para
-							Internet da UNCISAL.
-						</Text>
-
-						{/* Demonstração do sistema de temas */}
-						<Group justify="center" gap="xs">
-							<Badge variant="light" color={isDark ? "yellow" : "blue"}>
-								Tema: {colorScheme}
-							</Badge>
-							<Badge variant="outline" color="gray">
-								Ativo: {computedColorScheme}
-							</Badge>
-						</Group>
-					</Stack>
-				</Paper>
-			</Stack>
-		</Container>
+							{/* Demonstração do sistema de temas */}
+							<Group justify="center" gap="xs">
+								<Badge variant="light" color={isDark ? "yellow" : "blue"}>
+									Tema: {colorScheme}
+								</Badge>
+								<Badge variant="outline" color="gray">
+									Ativo: {computedColorScheme}
+								</Badge>
+							</Group>
+						</Stack>
+					</Paper>
+				</Stack>
+			</Container>
+		</AppLayout>
 	);
 }
