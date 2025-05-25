@@ -8,7 +8,7 @@ export const metadata: Metadata = {
 	metadataBase: new URL(getBaseUrl()),
 	title: "VacinaPI",
 	description:
-		"Projeto desenvolvido para o curso de Sistemas para Internet da UNCISAL.",
+		"Sistema de gestão de vacinação - Projeto desenvolvido para o curso de Sistemas para Internet da UNCISAL.",
 };
 
 export default function RootLayout({

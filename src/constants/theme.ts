@@ -23,8 +23,8 @@ export const theme = createTheme({
 		light: 6,
 		dark: 8,
 	},
-	scale: 1,
-	autoContrast: false,
+	// Removido 'scale' pois foi deprecated no v8
+	autoContrast: true, // Mudado para true por padrão no v8
 	luminanceThreshold: 0.3,
 	defaultGradient: {
 		from: "deepblue",
