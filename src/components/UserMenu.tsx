@@ -2,47 +2,158 @@
 
 import { signOut } from "@/app/auth/actions";
 import { useAuth } from "@/contexts";
-import { Avatar, Group, Text, Tooltip, UnstyledButton } from "@mantine/core";
-import { LogOut } from "lucide-react";
+import {
+	Avatar,
+	Group,
+	Menu,
+	Text,
+	UnstyledButton,
+	useMantineColorScheme,
+} from "@mantine/core";
+import { ChevronDown, LogOut, Monitor, Moon, Sun } from "lucide-react";
+import { forwardRef } from "react";
 
 interface UserMenuProps {
 	className?: string;
 }
 
-export function UserMenu({ className }: UserMenuProps) {
-	const { user } = useAuth();
+interface UserButtonProps extends React.ComponentPropsWithoutRef<"button"> {
+	image?: string;
+	name: string;
+	email: string;
+	icon?: React.ReactNode;
+}
 
-	if (!user) return null;
-
-	return (
-		<div className={className}>
+const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
+	({ image, name, email, icon, ...others }, ref) => (
+		<UnstyledButton
+			ref={ref}
+			style={{
+				padding: "var(--mantine-spacing-xs)",
+				color: "var(--mantine-color-text)",
+				borderRadius: "var(--mantine-radius-sm)",
+				transition: "background-color 0.15s ease",
+			}}
+			styles={{
+				root: {
+					"&:hover": {
+						backgroundColor: "var(--mantine-color-gray-light-hover)",
+					},
+				},
+			}}
+			{...others}
+		>
 			<Group gap="sm">
-				<Avatar
-					src={user.user_metadata?.avatar_url}
-					alt={user.user_metadata?.full_name || user.email || "Usuário"}
-					size="sm"
-				>
-					{(user.user_metadata?.full_name ||
-						user.email ||
-						"U")[0].toUpperCase()}
+				<Avatar src={image} size="sm">
+					{name[0].toUpperCase()}
 				</Avatar>
+
 				<div style={{ flex: 1 }}>
 					<Text size="sm" fw={500}>
-						{user.user_metadata?.full_name || "Usuário"}
+						{name}
 					</Text>
-					<Text size="xs" c="dimmed">
-						{user.email}
+					<Text c="dimmed" size="xs">
+						{email}
 					</Text>
 				</div>
 
-				<form action={signOut} style={{ display: "inline" }}>
-					<Tooltip label="Sair">
-						<UnstyledButton type="submit" p="xs">
-							<LogOut size={16} />
-						</UnstyledButton>
-					</Tooltip>
-				</form>
+				{icon || <ChevronDown size={14} />}
 			</Group>
+		</UnstyledButton>
+	)
+);
+
+UserButton.displayName = "UserButton";
+
+export function UserMenu({ className }: UserMenuProps) {
+	const { user } = useAuth();
+	const { colorScheme, setColorScheme } = useMantineColorScheme();
+
+	if (!user) return null;
+
+	const handleThemeChange = (newScheme: "light" | "dark" | "auto") => {
+		setColorScheme(newScheme);
+	};
+
+	const getThemeIcon = (scheme: "light" | "dark" | "auto") => {
+		switch (scheme) {
+			case "light":
+				return <Sun size={14} />;
+			case "dark":
+				return <Moon size={14} />;
+			case "auto":
+				return <Monitor size={14} />;
+		}
+	};
+
+	const getThemeLabel = (scheme: "light" | "dark" | "auto") => {
+		switch (scheme) {
+			case "light":
+				return "Tema Claro";
+			case "dark":
+				return "Tema Escuro";
+			case "auto":
+				return "Tema Automático";
+		}
+	};
+
+	return (
+		<div className={className}>
+			<Menu
+				shadow="md"
+				width={200}
+				position="bottom-end"
+				withArrow
+				arrowPosition="side"
+			>
+				<Menu.Target>
+					<UserButton
+						image={user.user_metadata?.avatar_url}
+						name={user.user_metadata?.full_name || "Usuário"}
+						email={user.email || ""}
+					/>
+				</Menu.Target>
+
+				<Menu.Dropdown>
+					<Menu.Label>Preferências</Menu.Label>
+					<Menu.Item
+						leftSection={getThemeIcon("light")}
+						onClick={() => handleThemeChange("light")}
+						rightSection={colorScheme === "light" ? "✓" : undefined}
+					>
+						{getThemeLabel("light")}
+					</Menu.Item>
+
+					<Menu.Item
+						leftSection={getThemeIcon("dark")}
+						onClick={() => handleThemeChange("dark")}
+						rightSection={colorScheme === "dark" ? "✓" : undefined}
+					>
+						{getThemeLabel("dark")}
+					</Menu.Item>
+
+					<Menu.Item
+						leftSection={getThemeIcon("auto")}
+						onClick={() => handleThemeChange("auto")}
+						rightSection={colorScheme === "auto" ? "✓" : undefined}
+					>
+						{getThemeLabel("auto")}
+					</Menu.Item>
+
+					<Menu.Divider />
+
+					<Menu.Label>Conta</Menu.Label>
+					<Menu.Item
+						leftSection={<LogOut size={14} />}
+						color="red"
+						onClick={async () => {
+							await signOut();
+						}}
+					>
+						Sair
+					</Menu.Item>
+				</Menu.Dropdown>
+			</Menu>
 		</div>
 	);
 }

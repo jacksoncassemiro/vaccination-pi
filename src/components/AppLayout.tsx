@@ -5,20 +5,14 @@ import { AppShell, Group, Text, UnstyledButton } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { ReactNode } from "react";
 import { Logo } from "./Logo";
-import { ThemeToggle } from "./ThemeToggle";
 import { UserMenu } from "./UserMenu";
 
 interface AppLayoutProps {
 	children: ReactNode;
 	showUserMenu?: boolean;
-	showThemeToggle?: boolean;
 }
 
-export function AppLayout({
-	children,
-	showUserMenu = true,
-	showThemeToggle = true,
-}: AppLayoutProps) {
+export function AppLayout({ children, showUserMenu = true }: AppLayoutProps) {
 	const { user } = useAuth();
 	const router = useRouter();
 
@@ -42,7 +36,6 @@ export function AppLayout({
 
 					{/* Controles do Header */}
 					<Group gap="sm" align="center">
-						{showThemeToggle && <ThemeToggle size="sm" variant="subtle" />}
 						{showUserMenu && user && <UserMenu />}
 					</Group>
 				</Group>
