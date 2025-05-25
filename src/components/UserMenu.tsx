@@ -11,7 +11,6 @@ import {
 	useMantineColorScheme,
 } from "@mantine/core";
 import { ChevronDown, LogOut, Monitor, Moon, Sun } from "lucide-react";
-import { forwardRef } from "react";
 
 interface UserMenuProps {
 	className?: string;
@@ -24,10 +23,10 @@ interface UserButtonProps extends React.ComponentPropsWithoutRef<"button"> {
 	icon?: React.ReactNode;
 }
 
-const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
-	({ image, name, email, icon, ...others }, ref) => (
+// React 19: ref como prop - sem forwardRef
+function UserButton({ image, name, email, icon, ...others }: UserButtonProps) {
+	return (
 		<UnstyledButton
-			ref={ref}
 			style={{
 				padding: "var(--mantine-spacing-xs)",
 				color: "var(--mantine-color-text)",
@@ -60,10 +59,8 @@ const UserButton = forwardRef<HTMLButtonElement, UserButtonProps>(
 				{icon || <ChevronDown size={14} />}
 			</Group>
 		</UnstyledButton>
-	)
-);
-
-UserButton.displayName = "UserButton";
+	);
+}
 
 export function UserMenu({ className }: UserMenuProps) {
 	const { user } = useAuth();

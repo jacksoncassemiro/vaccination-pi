@@ -1,22 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# VacinaPI
+
+Sistema de gerenciamento de vacinação construído com Next.js, Supabase e Mantine UI.
 
 ## Getting Started
 
-First, run the development server:
+Este projeto usa **Yarn** como gerenciador de pacotes. Primeiro, instale as dependências:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+yarn install
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Em seguida, execute o servidor de desenvolvimento:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+yarn dev
+```
+
+Abra [http://localhost:3000](http://localhost:3000) no seu navegador para ver o resultado.
+
+Você pode começar a editar a página modificando `src/app/page.tsx`. A página atualiza automaticamente conforme você edita o arquivo.
+
+## Configuração do Ambiente
+
+1. Copie o arquivo `.env.example` para `.env.local`:
+
+   ```bash
+   copy .env.example .env.local
+   ```
+
+2. Configure as variáveis de ambiente no arquivo `.env.local` com suas credenciais do Supabase.
+
+## Scripts Disponíveis
+
+- `yarn dev` - Inicia o servidor de desenvolvimento
+- `yarn build` - Constrói a aplicação para produção
+- `yarn start` - Inicia o servidor de produção
+- `yarn lint` - Executa o linter ESLint
+
+## Tecnologias Utilizadas
+
+- **Next.js 15** - Framework React
+- **React 19** - Biblioteca de interface do usuário
+- **Mantine v8** - Biblioteca de componentes UI
+- **Supabase** - Backend-as-a-Service (autenticação, banco de dados)
+- **TypeScript** - Linguagem de programação
+- **Tailwind CSS v4** - Framework CSS utilitário
+- **Yarn** - Gerenciador de pacotes
 
 ## Learn More
 
