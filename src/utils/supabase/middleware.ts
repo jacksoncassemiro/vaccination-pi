@@ -3,6 +3,7 @@ import { type NextRequest, NextResponse } from "next/server";
 
 export const updateSession = async (request: NextRequest) => {
 	const pathname = request.nextUrl.pathname;
+
 	// Crie uma resposta não modificada
 	let supabaseResponse = NextResponse.next({
 		request,
@@ -41,6 +42,7 @@ export const updateSession = async (request: NextRequest) => {
 	const isPublicRoute = publicRoutes.some((route) =>
 		pathname.startsWith(route)
 	);
+
 	// Se não há usuário válido e não está em uma rota pública, redireciona para login
 	if (!user && !isPublicRoute) {
 		const redirectUrl = new URL("/auth", request.url);
