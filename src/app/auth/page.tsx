@@ -1,8 +1,9 @@
 "use client";
 
-import { LoadingScreen } from "@/components";
+import { LoadingScreen, ThemeToggle } from "@/components";
 import { useAuth } from "@/contexts";
 import {
+	Box,
 	Button,
 	Center,
 	Container,
@@ -24,7 +25,12 @@ export default function AuthPage() {
 	return (
 		<Container size="sm" py="xl">
 			<Center h="70vh">
-				<Paper p="xl" radius="md" withBorder w="100%" maw={400}>
+				<Paper p="xl" radius="md" withBorder w="100%" maw={400} pos="relative">
+					{/* Theme Toggle no canto superior direito */}
+					<Box pos="absolute" top="md" right="md">
+						<ThemeToggle size="sm" variant="subtle" />
+					</Box>
+
 					<Stack gap="lg">
 						<Stack gap="sm" ta="center">
 							<Title order={1}>VacinaPI</Title>

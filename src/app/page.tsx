@@ -2,10 +2,20 @@
 
 import { LoadingScreen, UserMenu } from "@/components";
 import { useAuth } from "@/contexts";
-import { Container, Group, Paper, Stack, Text, Title } from "@mantine/core";
+import { useColorScheme } from "@/hooks";
+import {
+	Badge,
+	Container,
+	Group,
+	Paper,
+	Stack,
+	Text,
+	Title,
+} from "@mantine/core";
 
 export default function HomePage() {
 	const { user, loading } = useAuth();
+	const { colorScheme, computedColorScheme, isDark } = useColorScheme();
 
 	if (loading) {
 		return <LoadingScreen />;
@@ -37,6 +47,16 @@ export default function HomePage() {
 							Sistema de gestão de vacinação para o curso de Sistemas para
 							Internet da UNCISAL.
 						</Text>
+
+						{/* Demonstração do sistema de temas */}
+						<Group justify="center" gap="xs">
+							<Badge variant="light" color={isDark ? "yellow" : "blue"}>
+								Tema: {colorScheme}
+							</Badge>
+							<Badge variant="outline" color="gray">
+								Ativo: {computedColorScheme}
+							</Badge>
+						</Group>
 					</Stack>
 				</Paper>
 			</Stack>
