@@ -3,7 +3,7 @@
 import { AppLayout } from "@/components/AppLayout";
 import { patientSchema } from "@/schemas/patientSchema";
 import { Button, Group, Input, Stack, TextInput, Title } from "@mantine/core";
-import { DateInput } from "@mantine/dates";
+import { DatePickerInput } from "@mantine/dates";
 import { useForm, zodResolver } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { ArrowLeft } from "lucide-react";
@@ -152,7 +152,7 @@ export default function PatientFormPage() {
 							/>
 						</Input.Wrapper>
 
-						<DateInput
+						<DatePickerInput
 							label="Data de Nascimento"
 							placeholder="Selecione a data de nascimento"
 							valueFormat="DD/MM/YYYY"
