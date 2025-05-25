@@ -50,7 +50,6 @@ export function AuthProvider({ children }: AuthProviderProps) {
 		if (!initialized) {
 			initializeAuth();
 		}
-
 		// Escutar mudanças no estado de autenticação
 		const {
 			data: { subscription },
@@ -69,8 +68,13 @@ export function AuthProvider({ children }: AuthProviderProps) {
 				router.push("/auth");
 			}
 
-			// Se o usuário fez login, redirecionar para página inicial
-			if (event === "SIGNED_IN" && session?.user) {
+			// Só redirecionar para home no login se estiver na página de auth
+			// Isso evita redirecionamentos desnecessários de outras páginas
+			if (
+				event === "SIGNED_IN" &&
+				session?.user &&
+				window.location.pathname === "/auth"
+			) {
 				router.push("/");
 			}
 		});
