@@ -14,34 +14,55 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export function AuthProvider({ children }: AuthProviderProps) {
 	const [user, setUser] = useState<User | null>(null);
 	const [loading, setLoading] = useState(true);
+	const [initialized, setInitialized] = useState(false);
 	const router = useRouter();
 	const supabase = browserClient();
 
 	useEffect(() => {
-		const getUser = async () => {
+		const initializeAuth = async () => {
 			try {
+				// Primeiro, verificar se há uma sessão ativa
 				const {
-					data: { user },
-					error,
-				} = await supabase.auth.getUser();
-				if (error) {
-					console.error("Erro ao obter usuário:", error);
+					data: { session },
+					error: sessionError,
+				} = await supabase.auth.getSession();
+
+				if (sessionError) {
+					console.warn(
+						"Nenhuma sessão ativa encontrada:",
+						sessionError.message
+					);
+					setUser(null);
+				} else if (session?.user) {
+					setUser(session.user);
+				} else {
+					setUser(null);
 				}
-				setUser(user);
 			} catch (error) {
-				console.error("Erro inesperado ao obter usuário:", error);
+				console.error("Erro inesperado ao obter sessão:", error);
+				setUser(null);
 			} finally {
 				setLoading(false);
+				setInitialized(true);
 			}
 		};
 
-		getUser();
+		if (!initialized) {
+			initializeAuth();
+		}
 
 		// Escutar mudanças no estado de autenticação
 		const {
 			data: { subscription },
 		} = supabase.auth.onAuthStateChange(async (event, session) => {
+			console.log(
+				"Auth state changed:",
+				event,
+				session?.user ? "User logged in" : "No user"
+			);
+
 			setUser(session?.user ?? null);
+			setLoading(false);
 
 			// Se o usuário fez logout, redirecionar para página de auth
 			if (event === "SIGNED_OUT") {
@@ -57,7 +78,7 @@ export function AuthProvider({ children }: AuthProviderProps) {
 		return () => {
 			subscription.unsubscribe();
 		};
-	}, [supabase.auth, router]);
+	}, [initialized, supabase.auth, router]);
 
 	const signOut = async () => {
 		try {
