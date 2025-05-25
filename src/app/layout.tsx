@@ -6,7 +6,7 @@ import { MantineAllProviders } from "@/contexts";
 
 export const metadata: Metadata = {
 	metadataBase: new URL(getBaseUrl()),
-	title: "Todolist PI",
+	title: "VacinaPI",
 	description:
 		"Projeto desenvolvido para o curso de Sistemas para Internet da UNCISAL.",
 };
