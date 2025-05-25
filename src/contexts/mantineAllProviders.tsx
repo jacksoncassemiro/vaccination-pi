@@ -1,5 +1,6 @@
 import "@mantine/charts/styles.css";
 import "@mantine/core/styles.css";
+import "@mantine/dates/styles.css";
 import { ModalsProvider } from "@mantine/modals";
 import { Notifications } from "@mantine/notifications";
 import "@mantine/notifications/styles.css";

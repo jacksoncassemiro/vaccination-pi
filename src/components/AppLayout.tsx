@@ -3,12 +3,14 @@
 import { useAuth } from "@/contexts";
 import {
 	AppShell,
+	Button,
 	Container,
 	Group,
 	Text,
 	UnstyledButton,
 } from "@mantine/core";
-import { useRouter } from "next/navigation";
+import { Users } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
 import { ReactNode } from "react";
 import { Logo } from "./Logo";
 import { UserMenu } from "./UserMenu";
@@ -21,10 +23,16 @@ interface AppLayoutProps {
 export function AppLayout({ children, showUserMenu = true }: AppLayoutProps) {
 	const { user } = useAuth();
 	const router = useRouter();
+	const pathname = usePathname();
 
 	const handleTitleClick = () => {
 		router.push("/");
 	};
+
+	const handlePatientsClick = () => {
+		router.push("/patients");
+	};
+
 	return (
 		<AppShell header={{ height: 60 }} padding="md">
 			<AppShell.Header>
@@ -43,6 +51,20 @@ export function AppLayout({ children, showUserMenu = true }: AppLayoutProps) {
 								</Text>
 							</UnstyledButton>
 						</Group>
+
+						{/* Navegação */}
+						{user && (
+							<Group gap="xs" align="center">
+								<Button
+									variant={pathname === "/patients" ? "filled" : "subtle"}
+									leftSection={<Users size={16} />}
+									onClick={handlePatientsClick}
+									size="sm"
+								>
+									Pacientes
+								</Button>
+							</Group>
+						)}
 
 						{/* Controles do Header */}
 						<Group gap="sm" align="center">
