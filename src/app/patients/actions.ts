@@ -1,10 +1,15 @@
 "use server";
 
-import type { PatientFormData } from "@/schemas/patientSchema";
+import { type PatientFormData } from "@/schemas/patientSchema";
 import type { PatientsResponse, PatientsSearchFilters } from "@/types/patients";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
+
+// Tipo específico para as actions que recebem FormData (birth_date como string)
+type PatientActionData = Omit<PatientFormData, "birth_date"> & {
+	birth_date: string;
+};
 
 export async function getPatients(
 	filters: PatientsSearchFilters = {}
@@ -86,9 +91,8 @@ export async function createPatient(formData: FormData) {
 	if (authError || !user) {
 		redirect("/auth?error=unauthorized");
 	}
-
 	// Extrair dados do FormData
-	const patientData: PatientFormData = {
+	const patientData: PatientActionData = {
 		full_name: formData.get("full_name") as string,
 		cpf: formData.get("cpf") as string,
 		birth_date: formData.get("birth_date") as string,
@@ -145,9 +149,8 @@ export async function updatePatient(id: string, formData: FormData) {
 	if (authError || !user) {
 		redirect("/auth?error=unauthorized");
 	}
-
 	// Extrair dados do FormData
-	const patientData: Partial<PatientFormData> = {
+	const patientData: Partial<PatientActionData> = {
 		full_name: formData.get("full_name") as string,
 		cpf: formData.get("cpf") as string,
 		birth_date: formData.get("birth_date") as string,

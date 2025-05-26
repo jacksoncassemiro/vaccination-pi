@@ -1,142 +1,16 @@
 "use client";
 
 import { AppLayout } from "@/components/AppLayout";
-import {
-	Button,
-	Grid,
-	Group,
-	Input,
-	Select,
-	Stack,
-	TextInput,
-	Title,
-} from "@mantine/core";
-import { DatePickerInput } from "@mantine/dates"; // Mantido como DatePickerInput
+import { PatientFormFields } from "@/components/PatientFormFields";
+import { fetchAddressByCep } from "@/lib/viaCep";
+import { patientSchema, type PatientFormData } from "@/schemas/patientSchema";
+import { Button, Group, Stack, Title } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { ArrowLeft } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useState, useTransition } from "react"; // Adicionado useState
-import { IMaskInput } from "react-imask";
-import { z } from "zod";
+import { useCallback, useEffect, useState, useTransition } from "react";
 import { createPatient, getPatientById, updatePatient } from "../actions";
-
-// Esquema de formulário que aceita Date para birth_date
-const formSchema = z.object({
-	full_name: z
-		.string()
-		.min(2, "Nome deve ter pelo menos 2 caracteres")
-		.max(255, "Nome deve ter no máximo 255 caracteres")
-		.regex(/^[a-zA-ZÀ-ÿ\s]+$/, "Nome deve conter apenas letras e espaços"),
-
-	cpf: z.string().min(1, "CPF é obrigatório"),
-	birth_date: z.coerce
-		.date({
-			errorMap: (issue, { defaultError }) => ({
-				message:
-					issue.code === "invalid_date"
-						? "Data de nascimento inválida"
-						: defaultError,
-			}),
-		})
-		.refine((date) => {
-			const today = new Date();
-			// Garante que 'date' seja um objeto Date válido antes de chamar getFullYear()
-			if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
-				return false;
-			}
-			const birthYear = date.getFullYear();
-			const currentYear = today.getFullYear();
-			let age = currentYear - birthYear;
-			const monthDiff = today.getMonth() - date.getMonth();
-			if (
-				monthDiff < 0 ||
-				(monthDiff === 0 && today.getDate() < date.getDate())
-			) {
-				age--;
-			}
-			return age >= 0 && age <= 150;
-		}, "Data de nascimento inválida ou idade fora do permitido (0-150 anos)"),
-
-	phone: z.string().min(1, "Telefone é obrigatório"),
-	cep: z.string().min(1, "CEP é obrigatório"),
-	street: z
-		.string()
-		.min(1, "Rua é obrigatória")
-		.max(255, "Rua deve ter no máximo 255 caracteres"),
-	number: z
-		.string()
-		.min(1, "Número é obrigatório")
-		.max(20, "Número deve ter no máximo 20 caracteres"),
-	complement: z
-		.string()
-		.max(255, "Complemento deve ter no máximo 255 caracteres")
-		.optional(),
-	neighborhood: z
-		.string()
-		.min(1, "Bairro é obrigatório")
-		.max(255, "Bairro deve ter no máximo 255 caracteres"),
-	city: z
-		.string()
-		.min(1, "Cidade é obrigatória")
-		.max(255, "Cidade deve ter no máximo 255 caracteres"),
-	state: z
-		.string()
-		.min(2, "Estado é obrigatório")
-		.max(2, "Estado deve ter 2 caracteres"),
-});
-
-type FormData = z.infer<typeof formSchema>;
-
-// Função para buscar endereço pelo CEP (sem alterações)
-const fetchAddressByCep = async (cep: string) => {
-	const cleanCep = cep.replace(/\D/g, "");
-	if (cleanCep.length !== 8) return null;
-	try {
-		const response = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
-		const data = await response.json();
-		if (data.erro) return null;
-		return {
-			street: data.logradouro || "",
-			neighborhood: data.bairro || "",
-			city: data.localidade || "",
-			state: data.uf || "",
-		};
-	} catch (error) {
-		console.error("Erro ao buscar CEP:", error);
-		return null;
-	}
-};
-
-const brazilianStates = [
-	{ value: "AC", label: "Acre" },
-	{ value: "AL", label: "Alagoas" },
-	{ value: "AP", label: "Amapá" },
-	{ value: "AM", label: "Amazonas" },
-	{ value: "BA", label: "Bahia" },
-	{ value: "CE", label: "Ceará" },
-	{ value: "DF", label: "Distrito Federal" },
-	{ value: "ES", label: "Espírito Santo" },
-	{ value: "GO", label: "Goiás" },
-	{ value: "MA", label: "Maranhão" },
-	{ value: "MT", label: "Mato Grosso" },
-	{ value: "MS", label: "Mato Grosso do Sul" },
-	{ value: "MG", label: "Minas Gerais" },
-	{ value: "PA", label: "Pará" },
-	{ value: "PB", label: "Paraíba" },
-	{ value: "PR", label: "Paraná" },
-	{ value: "PE", label: "Pernambuco" },
-	{ value: "PI", label: "Piauí" },
-	{ value: "RJ", label: "Rio de Janeiro" },
-	{ value: "RN", label: "Rio Grande do Norte" },
-	{ value: "RS", label: "Rio Grande do Sul" },
-	{ value: "RO", label: "Rondônia" },
-	{ value: "RR", label: "Roraima" },
-	{ value: "SC", label: "Santa Catarina" },
-	{ value: "SP", label: "São Paulo" },
-	{ value: "SE", label: "Sergipe" },
-	{ value: "TO", label: "Tocantins" },
-];
 
 export default function PatientFormPage() {
 	const router = useRouter();
@@ -144,9 +18,8 @@ export default function PatientFormPage() {
 	const patientId = searchParams.get("id");
 	const [isPending, startTransition] = useTransition();
 	const [isInitialLoadComplete, setIsInitialLoadComplete] = useState(false);
-
-	const form = useForm<FormData>({
-		validate: zodResolver(formSchema),
+	const form = useForm<PatientFormData>({
+		validate: zodResolver(patientSchema),
 		initialValues: {
 			full_name: "",
 			cpf: "",
@@ -161,7 +34,6 @@ export default function PatientFormPage() {
 			state: "",
 		},
 	});
-
 	// Efeito para carregar dados do paciente
 	useEffect(() => {
 		if (patientId) {
@@ -213,7 +85,8 @@ export default function PatientFormPage() {
 			form.reset();
 			setIsInitialLoadComplete(true);
 		}
-	}, [patientId, form]); // Depender de `form` (estável) e `patientId`
+		// eslint-disable-next-line react-hooks/exhaustive-deps
+	}, [patientId]); // Apenas depender de patientId
 
 	const handleCepChange = useCallback(
 		async (acceptedCepValue: string) => {
@@ -233,7 +106,7 @@ export default function PatientFormPage() {
 							form.values.city !== address.city ||
 							form.values.state !== address.state
 						) {
-							form.setValues((prev) => ({
+							form.setValues((prev: Partial<PatientFormData>) => ({
 								...prev,
 								street: address.street,
 								neighborhood: address.neighborhood,
@@ -258,11 +131,10 @@ export default function PatientFormPage() {
 		},
 		[form, isInitialLoadComplete]
 	);
-
-	const handleSubmit = (values: FormData) => {
+	const handleSubmit = (values: PatientFormData) => {
 		startTransition(async () => {
 			try {
-				const formDataToSubmit = new FormData();
+				const formDataToSubmit = new globalThis.FormData();
 				Object.entries(values).forEach(([key, value]) => {
 					if (value instanceof Date) {
 						formDataToSubmit.append(key, value.toISOString().split("T")[0]);
@@ -333,116 +205,14 @@ export default function PatientFormPage() {
 					>
 						Voltar
 					</Button>
-				</Group>
+				</Group>{" "}
 				<form onSubmit={form.onSubmit(handleSubmit)}>
 					<Stack gap="md">
-						<TextInput
-							label="Nome Completo"
-							placeholder="Digite o nome completo"
+						<PatientFormFields
+							form={form}
 							disabled={isPending}
-							{...form.getInputProps("full_name")}
+							onCepChange={handleCepChange}
 						/>
-						<Grid gutter="md">
-							<Grid.Col span={{ base: 12, sm: 6 }}>
-								<Input.Wrapper label="CPF" error={form.errors.cpf}>
-									<Input
-										component={IMaskInput}
-										mask="000.000.000-00"
-										placeholder="Digite o CPF"
-										disabled={isPending}
-										{...form.getInputProps("cpf")}
-									/>
-								</Input.Wrapper>
-							</Grid.Col>
-							<Grid.Col span={{ base: 12, sm: 6 }}>
-								<DatePickerInput
-									label="Data de Nascimento"
-									placeholder="Selecione a data"
-									valueFormat="DD/MM/YYYY"
-									locale="pt-br"
-									clearable
-									disabled={isPending}
-									{...form.getInputProps("birth_date")}
-								/>
-							</Grid.Col>
-						</Grid>
-						<Input.Wrapper label="Telefone" error={form.errors.phone}>
-							<Input
-								component={IMaskInput}
-								mask={[{ mask: "(00) 0000-0000" }, { mask: "(00) 00000-0000" }]}
-								placeholder="Digite o telefone"
-								disabled={isPending}
-								{...form.getInputProps("phone")}
-							/>
-						</Input.Wrapper>{" "}
-						<Grid gutter="md">
-							<Grid.Col span={{ base: 12, sm: 4 }}>
-								<Input.Wrapper label="CEP" error={form.errors.cep}>
-									<Input
-										component={IMaskInput}
-										mask="00000-000"
-										placeholder="Digite o CEP"
-										disabled={isPending}
-										onAccept={(value) => handleCepChange(String(value))}
-										{...form.getInputProps("cep")}
-									/>
-								</Input.Wrapper>
-							</Grid.Col>
-							<Grid.Col span={{ base: 12, sm: 8 }}>
-								<TextInput
-									label="Rua"
-									placeholder="Digite a rua"
-									disabled={isPending}
-									{...form.getInputProps("street")}
-								/>
-							</Grid.Col>
-						</Grid>
-						<Grid gutter="md">
-							<Grid.Col span={{ base: 12, sm: 3 }}>
-								<TextInput
-									label="Número"
-									placeholder="Digite o número"
-									disabled={isPending}
-									{...form.getInputProps("number")}
-								/>
-							</Grid.Col>
-							<Grid.Col span={{ base: 12, sm: 9 }}>
-								<TextInput
-									label="Complemento"
-									placeholder="Digite o complemento (opcional)"
-									disabled={isPending}
-									{...form.getInputProps("complement")}
-								/>
-							</Grid.Col>
-						</Grid>
-						<Grid gutter="md">
-							<Grid.Col span={{ base: 12, sm: 6 }}>
-								<TextInput
-									label="Bairro"
-									placeholder="Digite o bairro"
-									disabled={isPending}
-									{...form.getInputProps("neighborhood")}
-								/>
-							</Grid.Col>
-							<Grid.Col span={{ base: 12, sm: 4 }}>
-								<TextInput
-									label="Cidade"
-									placeholder="Digite a cidade"
-									disabled={isPending}
-									{...form.getInputProps("city")}
-								/>
-							</Grid.Col>
-							<Grid.Col span={{ base: 12, sm: 2 }}>
-								<Select
-									label="Estado"
-									placeholder="UF"
-									data={brazilianStates}
-									searchable
-									disabled={isPending}
-									{...form.getInputProps("state")}
-								/>
-							</Grid.Col>
-						</Grid>
 					</Stack>
 					<Group justify="flex-end" mt="xl">
 						<Button type="submit" loading={isPending} size="md">
