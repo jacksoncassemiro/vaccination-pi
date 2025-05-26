@@ -31,13 +31,32 @@ const formSchema = z.object({
 
 	cpf: z.string().min(1, "CPF é obrigatório"),
 
-	birth_date: z
-		.date({ required_error: "Data de nascimento é obrigatória" })
+	birth_date: z.coerce
+		.date({
+			errorMap: (issue, { defaultError }) => ({
+				message:
+					issue.code === "invalid_date"
+						? "Data de nascimento inválida"
+						: defaultError,
+			}),
+		})
 		.refine((date) => {
 			const today = new Date();
-			const age = today.getFullYear() - date.getFullYear();
+			if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
+				return false;
+			}
+			const birthYear = date.getFullYear();
+			const currentYear = today.getFullYear();
+			let age = currentYear - birthYear;
+			const monthDiff = today.getMonth() - date.getMonth();
+			if (
+				monthDiff < 0 ||
+				(monthDiff === 0 && today.getDate() < date.getDate())
+			) {
+				age--;
+			}
 			return age >= 0 && age <= 150;
-		}, "Data de nascimento inválida"),
+		}, "Data de nascimento inválida ou idade fora do permitido (0-150 anos)"),
 
 	phone: z.string().min(1, "Telefone é obrigatório"),
 
