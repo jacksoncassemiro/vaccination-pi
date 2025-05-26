@@ -26,8 +26,6 @@ export const MantineAllProviders = ({ children }: { children: ReactNode }) => {
 			>
 				<Notifications />
 				<ModalsProvider>
-					{" "}
-					{/* Adicionar ModalsProvider */}
 					<AuthProvider>{children}</AuthProvider>
 				</ModalsProvider>
 			</DatesProvider>
