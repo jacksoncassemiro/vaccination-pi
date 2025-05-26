@@ -6,6 +6,7 @@ import { fetchAddressByCep } from "@/lib/viaCep";
 import { patientSchema, type PatientFormData } from "@/schemas/patientSchema";
 import { Button, Group, Stack, Title } from "@mantine/core";
 import { useForm, zodResolver } from "@mantine/form";
+import { useDebouncedCallback } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
 import { ArrowLeft } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -52,7 +53,6 @@ export default function PatientFormPage() {
 							);
 						}
 					}
-
 					form.setValues({
 						full_name: patientToEdit.full_name || "",
 						cpf: patientToEdit.cpf || "",
@@ -88,13 +88,9 @@ export default function PatientFormPage() {
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [patientId]); // Apenas depender de patientId
 
-	const handleCepChange = useCallback(
+	// Função para buscar endereço com debounce
+	const debouncedFetchAddress = useDebouncedCallback(
 		async (acceptedCepValue: string) => {
-			const currentCepInForm = form.values.cep;
-			if (currentCepInForm !== acceptedCepValue) {
-				form.setFieldValue("cep", acceptedCepValue);
-			}
-
 			if (isInitialLoadComplete) {
 				const cleanCep = acceptedCepValue.replace(/\D/g, "");
 				if (cleanCep.length === 8) {
@@ -129,7 +125,19 @@ export default function PatientFormPage() {
 				}
 			}
 		},
-		[form, isInitialLoadComplete]
+		500
+	);
+
+	const handleCepChange = useCallback(
+		(acceptedCepValue: string) => {
+			const currentCepInForm = form.values.cep;
+			if (currentCepInForm !== acceptedCepValue) {
+				form.setFieldValue("cep", acceptedCepValue);
+			}
+			// Chamar a função com debounce
+			debouncedFetchAddress(acceptedCepValue);
+		},
+		[form, debouncedFetchAddress]
 	);
 	const handleSubmit = (values: PatientFormData) => {
 		startTransition(async () => {
