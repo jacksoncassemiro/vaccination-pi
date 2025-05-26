@@ -11,17 +11,17 @@ import {
 	TextInput,
 	Title,
 } from "@mantine/core";
-import { DatePickerInput } from "@mantine/dates";
+import { DatePickerInput } from "@mantine/dates"; // Mantido como DatePickerInput
 import { useForm, zodResolver } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
 import { ArrowLeft } from "lucide-react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useCallback, useEffect, useTransition } from "react";
+import { useCallback, useEffect, useState, useTransition } from "react"; // Adicionado useState
 import { IMaskInput } from "react-imask";
 import { z } from "zod";
 import { createPatient, getPatientById, updatePatient } from "../actions";
 
-// Esquema de formulário que aceita Date para birth_date e converte para string
+// Esquema de formulário que aceita Date para birth_date
 const formSchema = z.object({
 	full_name: z
 		.string()
@@ -30,7 +30,6 @@ const formSchema = z.object({
 		.regex(/^[a-zA-ZÀ-ÿ\s]+$/, "Nome deve conter apenas letras e espaços"),
 
 	cpf: z.string().min(1, "CPF é obrigatório"),
-
 	birth_date: z.coerce
 		.date({
 			errorMap: (issue, { defaultError }) => ({
@@ -42,6 +41,7 @@ const formSchema = z.object({
 		})
 		.refine((date) => {
 			const today = new Date();
+			// Garante que 'date' seja um objeto Date válido antes de chamar getFullYear()
 			if (!(date instanceof Date) || Number.isNaN(date.getTime())) {
 				return false;
 			}
@@ -59,34 +59,27 @@ const formSchema = z.object({
 		}, "Data de nascimento inválida ou idade fora do permitido (0-150 anos)"),
 
 	phone: z.string().min(1, "Telefone é obrigatório"),
-
 	cep: z.string().min(1, "CEP é obrigatório"),
-
 	street: z
 		.string()
 		.min(1, "Rua é obrigatória")
 		.max(255, "Rua deve ter no máximo 255 caracteres"),
-
 	number: z
 		.string()
 		.min(1, "Número é obrigatório")
 		.max(20, "Número deve ter no máximo 20 caracteres"),
-
 	complement: z
 		.string()
 		.max(255, "Complemento deve ter no máximo 255 caracteres")
 		.optional(),
-
 	neighborhood: z
 		.string()
 		.min(1, "Bairro é obrigatório")
 		.max(255, "Bairro deve ter no máximo 255 caracteres"),
-
 	city: z
 		.string()
 		.min(1, "Cidade é obrigatória")
 		.max(255, "Cidade deve ter no máximo 255 caracteres"),
-
 	state: z
 		.string()
 		.min(2, "Estado é obrigatório")
@@ -95,17 +88,14 @@ const formSchema = z.object({
 
 type FormData = z.infer<typeof formSchema>;
 
-// Função para buscar endereço pelo CEP
+// Função para buscar endereço pelo CEP (sem alterações)
 const fetchAddressByCep = async (cep: string) => {
 	const cleanCep = cep.replace(/\D/g, "");
 	if (cleanCep.length !== 8) return null;
-
 	try {
 		const response = await fetch(`https://viacep.com.br/ws/${cleanCep}/json/`);
 		const data = await response.json();
-
 		if (data.erro) return null;
-
 		return {
 			street: data.logradouro || "",
 			neighborhood: data.bairro || "",
@@ -118,7 +108,6 @@ const fetchAddressByCep = async (cep: string) => {
 	}
 };
 
-// Lista de estados brasileiros
 const brazilianStates = [
 	{ value: "AC", label: "Acre" },
 	{ value: "AL", label: "Alagoas" },
@@ -154,6 +143,7 @@ export default function PatientFormPage() {
 	const searchParams = useSearchParams();
 	const patientId = searchParams.get("id");
 	const [isPending, startTransition] = useTransition();
+	const [isInitialLoadComplete, setIsInitialLoadComplete] = useState(false);
 
 	const form = useForm<FormData>({
 		validate: zodResolver(formSchema),
@@ -172,101 +162,129 @@ export default function PatientFormPage() {
 		},
 	});
 
-	const handleCepChange = useCallback(
-		async (cep: string) => {
-			form.setFieldValue("cep", cep);
+	// Efeito para carregar dados do paciente
+	useEffect(() => {
+		if (patientId) {
+			setIsInitialLoadComplete(false); // Resetar flag antes de carregar
+			const fetchData = async () => {
+				try {
+					const patientToEdit = await getPatientById(patientId);
+					let birthDateForForm: Date = new Date();
+					if (patientToEdit.birth_date) {
+						const parsedDate = new Date(patientToEdit.birth_date);
+						if (!Number.isNaN(parsedDate.getTime())) {
+							birthDateForForm = parsedDate;
+						} else {
+							console.warn(
+								`Data de nascimento inválida recebida: ${patientToEdit.birth_date}`
+							);
+						}
+					}
 
-			const cleanCep = cep.replace(/\D/g, "");
-			if (cleanCep.length === 8) {
-				const address = await fetchAddressByCep(cep);
-				if (address) {
-					form.setValues((prev) => ({
-						...prev,
-						street: address.street,
-						neighborhood: address.neighborhood,
-						city: address.city,
-						state: address.state,
-					}));
-					notifications.show({
-						title: "Sucesso",
-						message: "Endereço preenchido automaticamente!",
-						color: "green",
+					form.setValues({
+						full_name: patientToEdit.full_name || "",
+						cpf: patientToEdit.cpf || "",
+						birth_date: birthDateForForm,
+						phone: patientToEdit.phone || "",
+						cep: patientToEdit.cep || "",
+						street: patientToEdit.street || "",
+						number: patientToEdit.number || "",
+						complement: patientToEdit.complement || "",
+						neighborhood: patientToEdit.neighborhood || "",
+						city: patientToEdit.city || "",
+						state: patientToEdit.state || "",
 					});
-				} else {
+					setIsInitialLoadComplete(true);
+				} catch (error) {
+					console.error("Erro ao buscar paciente:", error);
 					notifications.show({
-						title: "Aviso",
-						message: "CEP não encontrado. Preencha o endereço manualmente.",
-						color: "yellow",
+						title: "Erro",
+						message: "Não foi possível carregar os dados do paciente.",
+						color: "red",
 					});
+					setIsInitialLoadComplete(true); // Permite que o formulário seja usado mesmo com erro
+				}
+			};
+			startTransition(() => {
+				fetchData();
+			});
+		} else {
+			// Modo de criação: resetar para valores iniciais e marcar como completo
+			form.reset();
+			setIsInitialLoadComplete(true);
+		}
+	}, [patientId, form]); // Depender de `form` (estável) e `patientId`
+
+	const handleCepChange = useCallback(
+		async (acceptedCepValue: string) => {
+			const currentCepInForm = form.values.cep;
+			if (currentCepInForm !== acceptedCepValue) {
+				form.setFieldValue("cep", acceptedCepValue);
+			}
+
+			if (isInitialLoadComplete) {
+				const cleanCep = acceptedCepValue.replace(/\D/g, "");
+				if (cleanCep.length === 8) {
+					const address = await fetchAddressByCep(acceptedCepValue);
+					if (address) {
+						if (
+							form.values.street !== address.street ||
+							form.values.neighborhood !== address.neighborhood ||
+							form.values.city !== address.city ||
+							form.values.state !== address.state
+						) {
+							form.setValues((prev) => ({
+								...prev,
+								street: address.street,
+								neighborhood: address.neighborhood,
+								city: address.city,
+								state: address.state,
+							}));
+							notifications.show({
+								title: "Sucesso",
+								message: "Endereço preenchido automaticamente!",
+								color: "green",
+							});
+						}
+					} else {
+						notifications.show({
+							title: "Aviso",
+							message: "CEP não encontrado. Preencha o endereço manualmente.",
+							color: "yellow",
+						});
+					}
 				}
 			}
 		},
-		[form]
-	); // Função para carregar dados do paciente
-	const loadPatientData = useCallback(
-		async (id: string) => {
-			try {
-				const patientToEdit = await getPatientById(id);
-				form.setValues({
-					full_name: patientToEdit.full_name,
-					cpf: patientToEdit.cpf,
-					birth_date: patientToEdit.birth_date
-						? new Date(patientToEdit.birth_date)
-						: new Date(),
-					phone: patientToEdit.phone,
-					cep: patientToEdit.cep,
-					street: patientToEdit.street,
-					number: patientToEdit.number,
-					complement: patientToEdit.complement || "",
-					neighborhood: patientToEdit.neighborhood,
-					city: patientToEdit.city,
-					state: patientToEdit.state,
-				});
-			} catch (error) {
-				console.error("Erro ao buscar paciente:", error);
-				notifications.show({
-					title: "Erro",
-					message: "Não foi possível carregar os dados do paciente",
-					color: "red",
-				});
-			}
-		},
-		[form]
+		[form, isInitialLoadComplete]
 	);
-
-	// Buscar dados do paciente para edição
-	useEffect(() => {
-		if (patientId) {
-			startTransition(() => loadPatientData(patientId));
-		}
-	}, [patientId, loadPatientData]);
 
 	const handleSubmit = (values: FormData) => {
 		startTransition(async () => {
 			try {
-				const formData = new FormData();
+				const formDataToSubmit = new FormData();
 				Object.entries(values).forEach(([key, value]) => {
 					if (value instanceof Date) {
-						formData.append(key, value.toISOString().split("T")[0]);
+						formDataToSubmit.append(key, value.toISOString().split("T")[0]);
 					} else if (value !== null && value !== undefined) {
+						// Remover máscaras de CPF, Telefone, CEP antes de enviar
 						if (key === "cpf" || key === "phone" || key === "cep") {
-							console.log(String(value).replace(/\D/g, ""));
-							formData.append(key, String(value).replace(/\D/g, ""));
+							formDataToSubmit.append(key, String(value).replace(/\D/g, ""));
 						} else {
-							formData.append(key, String(value));
+							formDataToSubmit.append(key, String(value));
 						}
 					}
 				});
 
 				if (patientId) {
-					await updatePatient(patientId, formData);
+					await updatePatient(patientId, formDataToSubmit);
 					notifications.show({
 						title: "Sucesso",
 						message: "Paciente atualizado com sucesso!",
 						color: "green",
 					});
 				} else {
-					await createPatient(formData);
+					await createPatient(formDataToSubmit);
 					notifications.show({
 						title: "Sucesso",
 						message: "Paciente cadastrado com sucesso!",
@@ -276,10 +294,25 @@ export default function PatientFormPage() {
 				router.push("/patients");
 			} catch (error) {
 				console.error("Erro ao salvar paciente:", error);
+				const errorMessage =
+					error instanceof Error ? error.message : "Erro ao salvar paciente";
+				// Tentar extrair mensagens de erro do Zod se for um erro de validação da action
+				let finalMessage = errorMessage;
+				if (typeof error === "object" && error !== null && "message" in error) {
+					try {
+						const parsedError = JSON.parse(error.message as string);
+						if (Array.isArray(parsedError) && parsedError.length > 0) {
+							finalMessage = parsedError
+								.map((e: { message: string }) => e.message)
+								.join(", ");
+						}
+					} catch {
+						// Não era um JSON de erro do Zod, mantém a mensagem original
+					}
+				}
 				notifications.show({
 					title: "Erro",
-					message:
-						error instanceof Error ? error.message : "Erro ao salvar paciente",
+					message: finalMessage,
 					color: "red",
 				});
 			}
@@ -303,13 +336,12 @@ export default function PatientFormPage() {
 				</Group>
 				<form onSubmit={form.onSubmit(handleSubmit)}>
 					<Stack gap="md">
-						{/* Dados Pessoais */}
 						<TextInput
 							label="Nome Completo"
 							placeholder="Digite o nome completo"
+							disabled={isPending}
 							{...form.getInputProps("full_name")}
 						/>
-
 						<Grid gutter="md">
 							<Grid.Col span={{ base: 12, sm: 6 }}>
 								<Input.Wrapper label="CPF" error={form.errors.cpf}>
@@ -317,36 +349,32 @@ export default function PatientFormPage() {
 										component={IMaskInput}
 										mask="000.000.000-00"
 										placeholder="Digite o CPF"
-										value={form.values.cpf}
-										onAccept={(value: string) =>
-											form.setFieldValue("cpf", value)
-										}
+										disabled={isPending}
+										{...form.getInputProps("cpf")}
 									/>
 								</Input.Wrapper>
-							</Grid.Col>{" "}
+							</Grid.Col>
 							<Grid.Col span={{ base: 12, sm: 6 }}>
 								<DatePickerInput
 									label="Data de Nascimento"
-									placeholder="Selecione a data de nascimento"
+									placeholder="Selecione a data"
 									valueFormat="DD/MM/YYYY"
 									locale="pt-br"
 									clearable
+									disabled={isPending}
 									{...form.getInputProps("birth_date")}
 								/>
 							</Grid.Col>
 						</Grid>
-
 						<Input.Wrapper label="Telefone" error={form.errors.phone}>
 							<Input
 								component={IMaskInput}
-								mask="(00) 00000-0000"
+								mask={[{ mask: "(00) 0000-0000" }, { mask: "(00) 00000-0000" }]}
 								placeholder="Digite o telefone"
-								value={form.values.phone}
-								onAccept={(value: string) => form.setFieldValue("phone", value)}
+								disabled={isPending}
+								{...form.getInputProps("phone")}
 							/>
-						</Input.Wrapper>
-
-						{/* Endereço */}
+						</Input.Wrapper>{" "}
 						<Grid gutter="md">
 							<Grid.Col span={{ base: 12, sm: 4 }}>
 								<Input.Wrapper label="CEP" error={form.errors.cep}>
@@ -354,8 +382,9 @@ export default function PatientFormPage() {
 										component={IMaskInput}
 										mask="00000-000"
 										placeholder="Digite o CEP"
-										value={form.values.cep}
-										onAccept={handleCepChange}
+										disabled={isPending}
+										onAccept={(value) => handleCepChange(String(value))}
+										{...form.getInputProps("cep")}
 									/>
 								</Input.Wrapper>
 							</Grid.Col>
@@ -363,16 +392,17 @@ export default function PatientFormPage() {
 								<TextInput
 									label="Rua"
 									placeholder="Digite a rua"
+									disabled={isPending}
 									{...form.getInputProps("street")}
 								/>
 							</Grid.Col>
 						</Grid>
-
 						<Grid gutter="md">
 							<Grid.Col span={{ base: 12, sm: 3 }}>
 								<TextInput
 									label="Número"
 									placeholder="Digite o número"
+									disabled={isPending}
 									{...form.getInputProps("number")}
 								/>
 							</Grid.Col>
@@ -380,16 +410,17 @@ export default function PatientFormPage() {
 								<TextInput
 									label="Complemento"
 									placeholder="Digite o complemento (opcional)"
+									disabled={isPending}
 									{...form.getInputProps("complement")}
 								/>
 							</Grid.Col>
 						</Grid>
-
 						<Grid gutter="md">
 							<Grid.Col span={{ base: 12, sm: 6 }}>
 								<TextInput
 									label="Bairro"
 									placeholder="Digite o bairro"
+									disabled={isPending}
 									{...form.getInputProps("neighborhood")}
 								/>
 							</Grid.Col>
@@ -397,6 +428,7 @@ export default function PatientFormPage() {
 								<TextInput
 									label="Cidade"
 									placeholder="Digite a cidade"
+									disabled={isPending}
 									{...form.getInputProps("city")}
 								/>
 							</Grid.Col>
@@ -406,6 +438,7 @@ export default function PatientFormPage() {
 									placeholder="UF"
 									data={brazilianStates}
 									searchable
+									disabled={isPending}
 									{...form.getInputProps("state")}
 								/>
 							</Grid.Col>
