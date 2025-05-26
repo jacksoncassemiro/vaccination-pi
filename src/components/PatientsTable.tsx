@@ -124,7 +124,6 @@ export function PatientsTable({
 					<Table verticalSpacing="sm" horizontalSpacing="md">
 						<Table.Thead>
 							<Table.Tr>
-								{" "}
 								<Table.Th>Nome</Table.Th>
 								<Table.Th>CPF</Table.Th>
 								<Table.Th>Idade</Table.Th>
