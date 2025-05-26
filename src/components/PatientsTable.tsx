@@ -3,7 +3,6 @@
 import type { Patient } from "@/types/patients";
 import {
 	ActionIcon,
-	Badge,
 	Group,
 	Pagination,
 	Paper,
@@ -129,7 +128,6 @@ export function PatientsTable({
 								<Table.Th>Idade</Table.Th>
 								<Table.Th>Telefone</Table.Th>
 								<Table.Th>Cidade</Table.Th>
-								<Table.Th>Status</Table.Th>
 								<Table.Th>Ações</Table.Th>
 							</Table.Tr>
 						</Table.Thead>
@@ -163,11 +161,6 @@ export function PatientsTable({
 										<Text size="sm">
 											{patient.city} - {patient.state}
 										</Text>
-									</Table.Td>
-									<Table.Td>
-										<Badge variant="light" color="green" size="sm">
-											Ativo
-										</Badge>
 									</Table.Td>
 									<Table.Td>
 										<Group gap="xs">
