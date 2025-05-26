@@ -2,7 +2,6 @@ import "@mantine/charts/styles.css";
 import "@mantine/core/styles.css";
 import { DatesProvider } from "@mantine/dates";
 import "@mantine/dates/styles.css";
-import { ModalsProvider } from "@mantine/modals";
 import { Notifications } from "@mantine/notifications";
 import "@mantine/notifications/styles.css";
 import dayjs from "dayjs";
@@ -24,10 +23,8 @@ export const MantineAllProviders = ({ children }: { children: ReactNode }) => {
 					weekendDays: [0, 6],
 				}}
 			>
-				<ModalsProvider>
-					<Notifications />
-					<AuthProvider>{children}</AuthProvider>
-				</ModalsProvider>
+				<Notifications />
+				<AuthProvider>{children}</AuthProvider>
 			</DatesProvider>
 		</ThemeProvider>
 	);
