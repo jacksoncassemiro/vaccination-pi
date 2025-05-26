@@ -44,15 +44,27 @@ export const patientSchema = z.object({
 		.min(1, "CPF é obrigatório")
 		.refine((cpf) => isValidCpf(cpf), "CPF inválido"),
 
-	birth_date: z
-		.string()
-		.min(1, "Data de nascimento é obrigatória")
+	birth_date: z.coerce
+		.date({
+			errorMap: (issue, { defaultError }) => ({
+				message:
+					issue.code === "invalid_date"
+						? "Data de nascimento inválida"
+						: defaultError,
+			}),
+		})
 		.refine((date) => {
-			const birthDate = new Date(date);
 			const today = new Date();
-			const age = today.getFullYear() - birthDate.getFullYear();
+			const age = today.getFullYear() - date.getFullYear();
+			const monthDiff = today.getMonth() - date.getMonth();
+			if (
+				monthDiff < 0 ||
+				(monthDiff === 0 && today.getDate() < date.getDate())
+			) {
+				return age - 1 >= 0;
+			}
 			return age >= 0 && age <= 150;
-		}, "Data de nascimento inválida"),
+		}, "Data de nascimento inválida ou idade fora do permitido (0-150 anos)"),
 
 	phone: z
 		.string()
