@@ -2,6 +2,7 @@ import "@mantine/charts/styles.css";
 import "@mantine/core/styles.css";
 import { DatesProvider } from "@mantine/dates";
 import "@mantine/dates/styles.css";
+import { ModalsProvider } from "@mantine/modals"; // Adicionar importação
 import { Notifications } from "@mantine/notifications";
 import "@mantine/notifications/styles.css";
 import dayjs from "dayjs";
@@ -24,7 +25,11 @@ export const MantineAllProviders = ({ children }: { children: ReactNode }) => {
 				}}
 			>
 				<Notifications />
-				<AuthProvider>{children}</AuthProvider>
+				<ModalsProvider>
+					{" "}
+					{/* Adicionar ModalsProvider */}
+					<AuthProvider>{children}</AuthProvider>
+				</ModalsProvider>
 			</DatesProvider>
 		</ThemeProvider>
 	);
