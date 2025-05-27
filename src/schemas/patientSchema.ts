@@ -68,10 +68,7 @@ export const patientSchema = z.object({
 	phone: z
 		.string()
 		.min(1, "Telefone é obrigatório")
-		.regex(
-			/^\d{10,11}$/,
-			"Telefone deve conter 10 ou 11 dígitos"
-		),
+		.regex(/^\d{10,11}$/, "Telefone deve conter 10 ou 11 dígitos"),
 
 	cep: z
 		.string()
