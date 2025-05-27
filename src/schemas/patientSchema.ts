@@ -65,13 +65,12 @@ export const patientSchema = z.object({
 			}
 			return age >= 0 && age <= 150;
 		}, "Data de nascimento inválida ou idade fora do permitido (0-150 anos)"),
-
 	phone: z
 		.string()
 		.min(1, "Telefone é obrigatório")
 		.regex(
-			/^\(\d{2}\)\s\d{4,5}-\d{4}$/,
-			"Telefone deve estar no formato (XX) XXXXX-XXXX"
+			/^\d{10,11}$/,
+			"Telefone deve conter 10 ou 11 dígitos"
 		),
 
 	cep: z
