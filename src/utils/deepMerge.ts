@@ -12,7 +12,7 @@ type DeepMergeType<Target extends object, Source extends object> = {
       : never;
 };
 
-const isObject = (obj: any) =>
+const isObject = (obj: unknown): obj is Record<string, unknown> =>
   obj !== null && typeof obj === "object" && !Array.isArray(obj);
 
 type DeepMergeReturn<Target extends object, Source extends object> =
@@ -30,6 +30,7 @@ export const deepMerge = <Target extends object, Source extends object>(
   const isTargetArray = Array.isArray(target);
 
   if (areBothObjects) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const result: any = {};
     let changed = false;
 
@@ -48,10 +49,12 @@ export const deepMerge = <Target extends object, Source extends object>(
     // Processa propriedades do source
     const sourceKeys = Object.keys(source);
     for (const key of sourceKeys) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const srcVal = source[key as keyof Source] as any;
       const targetHasKey = Object.prototype.hasOwnProperty.call(target, key);
 
       if (targetHasKey) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const tgtVal = target[key as keyof Target] as any;
         const areBothValuesObjects = isObject(tgtVal) && isObject(srcVal);
         const isSrcValArray = Array.isArray(srcVal);
@@ -100,7 +103,7 @@ export const deepMerge = <Target extends object, Source extends object>(
       source.length === target.length &&
       source.every((v, i) => Object.is(v, target[i]));
 
-    return areEqualArrays ? target : ([...source] as any);
+    return areEqualArrays ? target : ([...source] as DeepMergeReturn<Target, Source>);
   }
 
   // Caso padrão para primitivos

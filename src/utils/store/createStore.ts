@@ -1,6 +1,6 @@
 import { useLayoutEffect, useSyncExternalStore } from "react";
 import { deepMerge } from "@/utils/deepMerge";
-import { DeepPartial } from "@/types/Utils";
+import { DeepPartial } from "@/types";
 
 type Subscriber = () => void;
 type Unsubscribe = () => void;
