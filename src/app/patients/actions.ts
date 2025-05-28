@@ -105,7 +105,6 @@ export async function createPatient(formData: FormData) {
 		city: formData.get("city") as string,
 		state: formData.get("state") as string,
 	};
-
 	// Verificar se CPF já existe
 	const { data: existingPatient } = await supabase
 		.from("patients")
@@ -113,8 +112,14 @@ export async function createPatient(formData: FormData) {
 		.eq("cpf", patientData.cpf)
 		.single();
 
+	console.log("Verificação CPF duplicado:", {
+		cpf: patientData.cpf,
+		existingPatient,
+	});
+
 	if (existingPatient) {
-		throw new Error("CPF já cadastrado no sistema");
+		console.log("CPF duplicado encontrado, retornando erro");
+		return { success: false, error: "CPF já cadastrado no sistema" };
 	}
 
 	// Criar paciente
@@ -128,7 +133,10 @@ export async function createPatient(formData: FormData) {
 		.single();
 
 	if (error) {
-		throw new Error(`Erro ao criar paciente: ${error.message}`);
+		return {
+			success: false,
+			error: `Erro ao criar paciente: ${error.message}`,
+		};
 	}
 
 	// Revalidar a página de pacientes
@@ -163,7 +171,6 @@ export async function updatePatient(id: string, formData: FormData) {
 		city: formData.get("city") as string,
 		state: formData.get("state") as string,
 	};
-
 	// Verificar se CPF já existe (excluindo o paciente atual)
 	if (patientData.cpf) {
 		const { data: existingPatient } = await supabase
@@ -173,8 +180,15 @@ export async function updatePatient(id: string, formData: FormData) {
 			.neq("id", id)
 			.single();
 
+		console.log("Verificação CPF duplicado (update):", {
+			cpf: patientData.cpf,
+			existingPatient,
+			currentId: id,
+		});
+
 		if (existingPatient) {
-			throw new Error("CPF já cadastrado no sistema");
+			console.log("CPF duplicado encontrado na atualização, retornando erro");
+			return { success: false, error: "CPF já cadastrado no sistema" };
 		}
 	}
 
@@ -187,7 +201,10 @@ export async function updatePatient(id: string, formData: FormData) {
 		.single();
 
 	if (error) {
-		throw new Error(`Erro ao atualizar paciente: ${error.message}`);
+		return {
+			success: false,
+			error: `Erro ao atualizar paciente: ${error.message}`,
+		};
 	}
 
 	// Revalidar a página de pacientes

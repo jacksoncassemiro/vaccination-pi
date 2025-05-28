@@ -146,43 +146,55 @@ export default function PatientFormPage() {
 					}
 				});
 
+				console.log(
+					"Enviando dados:",
+					Object.fromEntries(formDataToSubmit.entries())
+				);
+
 				if (patientId) {
-					await updatePatient(patientId, formDataToSubmit);
-					notifications.show({
-						title: "Sucesso",
-						message: "Paciente atualizado com sucesso!",
-						color: "green",
-					});
+					const result = await updatePatient(patientId, formDataToSubmit);
+					console.log("Resultado updatePatient:", result);
+
+					if (result.success) {
+						notifications.show({
+							title: "Sucesso",
+							message: "Paciente atualizado com sucesso!",
+							color: "green",
+						});
+						router.push("/patients");
+					} else {
+						console.log("Erro capturado na atualização:", result.error);
+						notifications.show({
+							title: "Erro",
+							message: result.error || "Erro ao atualizar paciente",
+							color: "red",
+						});
+					}
 				} else {
-					await createPatient(formDataToSubmit);
-					notifications.show({
-						title: "Sucesso",
-						message: "Paciente cadastrado com sucesso!",
-						color: "green",
-					});
-				}
-				router.push("/patients");
-			} catch (error) {
-				console.error("Erro ao salvar paciente:", error);
-				const errorMessage =
-					error instanceof Error ? error.message : "Erro ao salvar paciente";
-				// Tentar extrair mensagens de erro do Zod se for um erro de validação da action
-				let finalMessage = errorMessage;
-				if (typeof error === "object" && error !== null && "message" in error) {
-					try {
-						const parsedError = JSON.parse(error.message as string);
-						if (Array.isArray(parsedError) && parsedError.length > 0) {
-							finalMessage = parsedError
-								.map((e: { message: string }) => e.message)
-								.join(", ");
-						}
-					} catch {
-						// Não era um JSON de erro do Zod, mantém a mensagem original
+					const result = await createPatient(formDataToSubmit);
+					console.log("Resultado createPatient:", result);
+
+					if (result.success) {
+						notifications.show({
+							title: "Sucesso",
+							message: "Paciente cadastrado com sucesso!",
+							color: "green",
+						});
+						router.push("/patients");
+					} else {
+						console.log("Erro capturado na criação:", result.error);
+						notifications.show({
+							title: "Erro",
+							message: result.error || "Erro ao cadastrar paciente",
+							color: "red",
+						});
 					}
 				}
+			} catch (error) {
+				console.error("Erro no catch do handleSubmit:", error);
 				notifications.show({
 					title: "Erro",
-					message: finalMessage,
+					message: "Erro inesperado ao salvar paciente",
 					color: "red",
 				});
 			}
