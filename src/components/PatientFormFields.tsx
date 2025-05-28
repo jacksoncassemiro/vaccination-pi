@@ -2,7 +2,38 @@ import type { PatientFormData } from "@/schemas/patientSchema";
 import { Grid, Input, Select, TextInput } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import type { UseFormReturnType } from "@mantine/form";
+import { memo } from "react";
 import { IMaskInput } from "react-imask";
+
+// Funções helper para formatação dos valores exibidos
+const formatCpfForDisplay = (value: string): string => {
+	const cleanValue = value.replace(/\D/g, "");
+	return cleanValue
+		.replace(/(\d{3})(\d)/, "$1.$2")
+		.replace(/(\d{3})(\d)/, "$1.$2")
+		.replace(/(\d{3})(\d{1,2})/, "$1-$2")
+		.replace(/(-\d{2})\d+?$/, "$1");
+};
+
+const formatPhoneForDisplay = (value: string): string => {
+	const cleanValue = value.replace(/\D/g, "");
+	if (cleanValue.length <= 10) {
+		return cleanValue
+			.replace(/(\d{2})(\d)/, "($1) $2")
+			.replace(/(\d{4})(\d)/, "$1-$2")
+			.replace(/(-\d{4})\d+?$/, "$1");
+	} else {
+		return cleanValue
+			.replace(/(\d{2})(\d)/, "($1) $2")
+			.replace(/(\d{5})(\d)/, "$1-$2")
+			.replace(/(-\d{4})\d+?$/, "$1");
+	}
+};
+
+const formatCepForDisplay = (value: string): string => {
+	const cleanValue = value.replace(/\D/g, "");
+	return cleanValue.replace(/(\d{5})(\d)/, "$1-$2");
+};
 
 interface PatientFormFieldsProps {
 	form: UseFormReturnType<PatientFormData>;
@@ -40,7 +71,7 @@ const brazilianStates = [
 	{ value: "TO", label: "Tocantins" },
 ];
 
-export function PatientFormFields({
+export const PatientFormFields = memo(function PatientFormFields({
 	form,
 	disabled,
 	onCepChange,
@@ -52,8 +83,9 @@ export function PatientFormFields({
 				placeholder="Digite o nome completo"
 				disabled={disabled}
 				{...form.getInputProps("full_name")}
-			/>
+			/>{" "}
 			<Grid gutter="md">
+				{" "}
 				<Grid.Col span={{ base: 12, sm: 6 }}>
 					<Input.Wrapper label="CPF" error={form.errors.cpf}>
 						<Input
@@ -61,7 +93,12 @@ export function PatientFormFields({
 							mask="000.000.000-00"
 							placeholder="Digite o CPF"
 							disabled={disabled}
-							{...form.getInputProps("cpf")}
+							value={formatCpfForDisplay(form.values.cpf)}
+							onAccept={(value) => {
+								// Remove a máscara e salva apenas os dígitos
+								const cleanValue = value.replace(/\D/g, "");
+								form.setFieldValue("cpf", cleanValue);
+							}}
 						/>
 					</Input.Wrapper>
 				</Grid.Col>
@@ -74,17 +111,23 @@ export function PatientFormFields({
 						{...form.getInputProps("birth_date")}
 					/>
 				</Grid.Col>
-			</Grid>
+			</Grid>{" "}
 			<Input.Wrapper label="Telefone" error={form.errors.phone}>
 				<Input
 					component={IMaskInput}
 					mask={[{ mask: "(00) 0000-0000" }, { mask: "(00) 00000-0000" }]}
 					placeholder="Digite o telefone"
 					disabled={disabled}
-					{...form.getInputProps("phone")}
+					value={formatPhoneForDisplay(form.values.phone)}
+					onAccept={(value) => {
+						// Remove a máscara e salva apenas os dígitos
+						const cleanValue = value.replace(/\D/g, "");
+						form.setFieldValue("phone", cleanValue);
+					}}
 				/>
 			</Input.Wrapper>
 			<Grid gutter="md">
+				{" "}
 				<Grid.Col span={{ base: 12, sm: 4 }}>
 					<Input.Wrapper label="CEP" error={form.errors.cep}>
 						<Input
@@ -92,8 +135,13 @@ export function PatientFormFields({
 							mask="00000-000"
 							placeholder="Digite o CEP"
 							disabled={disabled}
-							onAccept={(value) => onCepChange?.(String(value))}
-							{...form.getInputProps("cep")}
+							value={formatCepForDisplay(form.values.cep)}
+							onAccept={(value) => {
+								// Remove a máscara e salva apenas os dígitos
+								const cleanValue = value.replace(/\D/g, "");
+								form.setFieldValue("cep", cleanValue);
+								onCepChange?.(cleanValue);
+							}}
 						/>
 					</Input.Wrapper>
 				</Grid.Col>
@@ -154,4 +202,4 @@ export function PatientFormFields({
 			</Grid>
 		</>
 	);
-}
+});

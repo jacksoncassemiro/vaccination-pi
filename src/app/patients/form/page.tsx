@@ -87,7 +87,6 @@ export default function PatientFormPage() {
 		}
 		// eslint-disable-next-line react-hooks/exhaustive-deps
 	}, [patientId]); // Apenas depender de patientId
-
 	// Função para buscar endereço com debounce
 	const debouncedFetchAddress = useDebouncedCallback(
 		async (acceptedCepValue: string) => {
@@ -125,19 +124,15 @@ export default function PatientFormPage() {
 				}
 			}
 		},
-		500
+		300 // Reduzido de 500ms para 300ms para melhor responsividade
 	);
 
 	const handleCepChange = useCallback(
 		(acceptedCepValue: string) => {
-			const currentCepInForm = form.values.cep;
-			if (currentCepInForm !== acceptedCepValue) {
-				form.setFieldValue("cep", acceptedCepValue);
-			}
-			// Chamar a função com debounce
+			// Apenas chamar o debounce, o valor já é atualizado pelo form
 			debouncedFetchAddress(acceptedCepValue);
 		},
-		[form, debouncedFetchAddress]
+		[debouncedFetchAddress]
 	);
 	const handleSubmit = (values: PatientFormData) => {
 		startTransition(async () => {
@@ -147,12 +142,7 @@ export default function PatientFormPage() {
 					if (value instanceof Date) {
 						formDataToSubmit.append(key, value.toISOString().split("T")[0]);
 					} else if (value !== null && value !== undefined) {
-						// Remover máscaras de CPF, Telefone, CEP antes de enviar
-						if (key === "cpf" || key === "phone" || key === "cep") {
-							formDataToSubmit.append(key, String(value).replace(/\D/g, ""));
-						} else {
-							formDataToSubmit.append(key, String(value));
-						}
+						formDataToSubmit.append(key, String(value));
 					}
 				});
 

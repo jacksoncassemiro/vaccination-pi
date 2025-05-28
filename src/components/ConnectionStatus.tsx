@@ -3,6 +3,7 @@
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { Alert, Group, Text } from "@mantine/core";
 import { Wifi, WifiOff } from "lucide-react";
+import { memo } from "react";
 
 interface ConnectionStatusProps {
 	showWhenOnline?: boolean;
@@ -11,12 +12,14 @@ interface ConnectionStatusProps {
 /**
  * Componente que mostra o status de conexão do usuário.
  * Utiliza useSyncExternalStore para monitorar mudanças de conectividade.
+ * Memoizado para evitar re-renderizações desnecessárias.
  */
-export function ConnectionStatus({
+export const ConnectionStatus = memo(function ConnectionStatus({
 	showWhenOnline = false,
 }: ConnectionStatusProps) {
 	const isOnline = useOnlineStatus();
 
+	// Se está online e não deve mostrar quando online, não renderiza nada
 	if (isOnline && !showWhenOnline) {
 		return null;
 	}
@@ -39,4 +42,4 @@ export function ConnectionStatus({
 			</Group>
 		</Alert>
 	);
-}
+});
