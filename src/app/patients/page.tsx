@@ -2,6 +2,7 @@
 
 import { AppLayout } from "@/components/AppLayout";
 import { PatientsTable } from "@/components/PatientsTable";
+import { usePdfExport } from "@/hooks";
 import type { Patient, PatientsResponse } from "@/types/patients";
 import {
 	Button,
@@ -12,7 +13,7 @@ import {
 	TextInput,
 	Title,
 } from "@mantine/core";
-import { Plus, Search } from "lucide-react";
+import { FileDown, Plus, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 import { deletePatient, getPatients } from "./actions";
@@ -30,6 +31,7 @@ export default function PatientsPage() {
 	const [isPending, startTransition] = useTransition();
 	const [error, setError] = useState<string | null>(null);
 	const router = useRouter();
+	const { exportPatientsToPdf, exportPatientToPdf } = usePdfExport();
 	useEffect(() => {
 		startTransition(async () => {
 			try {
@@ -45,9 +47,23 @@ export default function PatientsPage() {
 			}
 		});
 	}, [search, currentPage]);
-
 	const handleAddPatient = () => {
 		router.push("/patients/form");
+	};
+	const handleExportToPdf = () => {
+		if (patients.data.length === 0) {
+			return;
+		}
+
+		const title = search
+			? `Pacientes - Busca: "${search}"`
+			: "Lista de Pacientes";
+
+		exportPatientsToPdf(patients.data, { title });
+	};
+
+	const handleExportPatientToPdf = (patient: Patient) => {
+		exportPatientToPdf(patient);
 	};
 
 	const handleEditPatient = (patient: Patient) => {
@@ -83,9 +99,22 @@ export default function PatientsPage() {
 								Gerencie o cadastro de pacientes do sistema
 							</Text>
 						</div>
-						<Button leftSection={<Plus size={16} />} onClick={handleAddPatient}>
-							Novo Paciente
-						</Button>
+						<Group>
+							<Button
+								variant="outline"
+								leftSection={<FileDown size={16} />}
+								onClick={handleExportToPdf}
+								disabled={patients.data.length === 0}
+							>
+								Exportar PDF
+							</Button>
+							<Button
+								leftSection={<Plus size={16} />}
+								onClick={handleAddPatient}
+							>
+								Novo Paciente
+							</Button>
+						</Group>
 					</Group>
 				</Paper>
 				{/* Filtros */}
@@ -100,7 +129,6 @@ export default function PatientsPage() {
 						/>
 					</Group>
 				</Paper>
-				{/* Estatísticas */}
 				<Paper p="md" withBorder>
 					<Group gap="xl">
 						<div>
@@ -131,15 +159,13 @@ export default function PatientsPage() {
 						)}
 					</Group>
 				</Paper>
-				{/* Erro */}
 				{error && (
 					<Paper p="md" withBorder bg="red.0">
 						<Text c="red" size="sm">
 							{error}
 						</Text>
 					</Paper>
-				)}{" "}
-				{/* Tabela */}
+				)}
 				<PatientsTable
 					patients={patients.data}
 					loading={isPending}
@@ -148,6 +174,7 @@ export default function PatientsPage() {
 					onPageChange={setCurrentPage}
 					onEdit={handleEditPatient}
 					onDelete={handleDeletePatient}
+					onExportPdf={handleExportPatientToPdf}
 				/>
 			</Stack>
 		</AppLayout>

@@ -2,6 +2,7 @@ export * from "./useAuth";
 export * from "./useFormCache";
 export * from "./useLocalStorage";
 export * from "./useOnlineStatus";
+export * from "./usePdfExport";
 export * from "./useSearchWithDebounce";
 export * from "./useSupabaseAuth";
 export * from "./useTheme";

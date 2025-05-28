@@ -14,7 +14,7 @@ import {
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { Edit, Trash2 } from "lucide-react";
+import { Edit, FileDown, Trash2 } from "lucide-react";
 
 interface PatientsTableProps {
 	patients: Patient[];
@@ -24,6 +24,7 @@ interface PatientsTableProps {
 	onPageChange: (page: number) => void;
 	onEdit: (patient: Patient) => void;
 	onDelete: (id: string) => Promise<void>;
+	onExportPdf?: (patient: Patient) => void;
 }
 
 function formatCpf(cpf: string): string {
@@ -59,6 +60,7 @@ export function PatientsTable({
 	onPageChange,
 	onEdit,
 	onDelete,
+	onExportPdf,
 }: PatientsTableProps) {
 	const handleDelete = (patient: Patient) => {
 		modals.openConfirmModal({
@@ -174,6 +176,20 @@ export function PatientsTable({
 													<Edit style={{ width: rem(16), height: rem(16) }} />
 												</ActionIcon>
 											</Tooltip>
+											{onExportPdf && (
+												<Tooltip label="Exportar PDF">
+													<ActionIcon
+														variant="subtle"
+														color="green"
+														size="sm"
+														onClick={() => onExportPdf(patient)}
+													>
+														<FileDown
+															style={{ width: rem(16), height: rem(16) }}
+														/>
+													</ActionIcon>
+												</Tooltip>
+											)}
 											<Tooltip label="Excluir paciente">
 												<ActionIcon
 													variant="subtle"
