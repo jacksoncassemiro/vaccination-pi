@@ -6,12 +6,14 @@ import {
 	Button,
 	Container,
 	Group,
+	Stack,
 	Text,
 	UnstyledButton,
 } from "@mantine/core";
 import { Users } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { ReactNode } from "react";
+import { ConnectionStatus } from "./ConnectionStatus";
 import { Logo } from "./Logo";
 import { UserMenu } from "./UserMenu";
 
@@ -73,9 +75,13 @@ export function AppLayout({ children, showUserMenu = true }: AppLayoutProps) {
 					</Group>
 				</Container>
 			</AppShell.Header>
-
 			<AppShell.Main>
-				<Container size="md">{children}</Container>
+				<Container size="md">
+					<Stack gap="md">
+						<ConnectionStatus />
+						{children}
+					</Stack>
+				</Container>
 			</AppShell.Main>
 		</AppShell>
 	);

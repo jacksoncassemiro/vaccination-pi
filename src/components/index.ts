@@ -1,4 +1,5 @@
 export * from "./AppLayout";
+export * from "./ConnectionStatus";
 export * from "./LoadingScreen";
 export * from "./Logo";
 export * from "./ThemeToggle";

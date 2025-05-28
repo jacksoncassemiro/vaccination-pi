@@ -1,6 +1,7 @@
 "use client";
 
 import { theme as baseTheme } from "@/constants/theme";
+import { useLocalStorage } from "@/hooks/useLocalStorage";
 import type {
 	ThemeContextType,
 	ThemeProviderProps,
@@ -11,17 +12,16 @@ import {
 	useComputedColorScheme,
 	useMantineColorScheme,
 } from "@mantine/core";
-import { useLocalStorage } from "@mantine/hooks";
 import { createContext, useContext } from "react";
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: ThemeProviderProps) {
-	const [colorScheme, setColorScheme] = useLocalStorage<MantineColorScheme>({
-		key: "mantine-color-scheme",
-		defaultValue: "auto",
-		getInitialValueInEffect: true,
-	});
+	// Usar o hook otimizado com useSyncExternalStore
+	const [colorScheme, setColorScheme] = useLocalStorage<MantineColorScheme>(
+		"mantine-color-scheme",
+		"auto"
+	);
 
 	const toggleColorScheme = () => {
 		const newScheme = colorScheme === "dark" ? "light" : "dark";
