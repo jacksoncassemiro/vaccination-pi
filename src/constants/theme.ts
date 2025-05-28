@@ -1,16 +1,16 @@
 import { createTheme, MantineColorsTuple } from "@mantine/core";
 
 const deepblue: MantineColorsTuple = [
-	"#ecefff",
-	"#d5dafb",
-	"#a9b1f1",
-	"#7a87e9",
-	"#5362e1",
-	"#3a4bdd",
-	"#2c40dc",
-	"#1f32c4",
-	"#182cb0",
-	"#0a259c",
+	"#e6f3ff",
+	"#cee2ff",
+	"#9cc2ff",
+	"#66a0fe",
+	"#3b83fd",
+	"#2171fd",
+	"#1168fe",
+	"#0058e4",
+	"#004ecc",
+	"#0043b4",
 ];
 
 export const theme = createTheme({
