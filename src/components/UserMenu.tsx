@@ -28,7 +28,7 @@ function UserButton({ image, name, email, icon, ...others }: UserButtonProps) {
 	return (
 		<UnstyledButton
 			style={{
-				padding: "var(--mantine-spacing-xs)",
+				padding: "var(--mantine-spacing-xs) 0",
 				color: "var(--mantine-color-text)",
 				borderRadius: "var(--mantine-radius-sm)",
 				transition: "background-color 0.15s ease",

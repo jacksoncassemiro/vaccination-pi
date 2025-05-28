@@ -6,7 +6,6 @@ import {
 	Burger,
 	Container,
 	Group,
-	NavLink,
 	ScrollArea,
 	Stack,
 	Text,
@@ -53,19 +52,16 @@ export function AppLayout({ children, showUserMenu = true }: AppLayoutProps) {
 		<AppShell
 			header={{ height: 60 }}
 			navbar={{
-				width: 280,
+				width: 300,
 				breakpoint: "sm",
-				collapsed: { mobile: !mobileOpened },
+				collapsed: { desktop: true, mobile: !mobileOpened },
 			}}
-			padding="md"
+			padding={{ base: "xs", sm: "md" }}
 		>
-			{" "}
 			<AppShell.Header>
 				<Container size="md" h="100%">
 					<Group h="100%" justify="space-between" align="center">
-						{/* Logo + Burger (lado a lado) */}
-						<Group gap="sm" align="center">
-							{/* Burger menu apenas no mobile */}
+						<Group gap="xs" align="center">
 							{user && (
 								<Burger
 									opened={mobileOpened}
@@ -74,8 +70,7 @@ export function AppLayout({ children, showUserMenu = true }: AppLayoutProps) {
 									size="sm"
 								/>
 							)}
-							<Logo size={32} clickable />
-							{/* Nome do sistema - oculto em mobile */}
+							<Logo size={26} clickable />
 							<UnstyledButton onClick={handleTitleClick} visibleFrom="sm">
 								<Text
 									size="lg"
@@ -87,14 +82,37 @@ export function AppLayout({ children, showUserMenu = true }: AppLayoutProps) {
 							</UnstyledButton>
 						</Group>
 
-						{/* Controles do Header */}
-						<Group gap="sm" align="center">
+						<Group gap={8} visibleFrom="sm">
+							{navigationItems.map((item) => (
+								<UnstyledButton
+									key={item.href}
+									size="compact-md"
+									component="button"
+									style={{
+										color: item.active
+											? "var(--mantine-color-dimmed)"
+											: "var(--mantine-color-text)",
+										cursor: item.active ? "default" : "pointer",
+									}}
+									disabled={item.active}
+									onClick={() => {
+										router.push(item.href);
+										toggleMobile();
+									}}
+								>
+									{item.label}
+								</UnstyledButton>
+							))}
+						</Group>
+
+						<Group gap="xs" align="center">
 							{showUserMenu && user && <UserMenu />}
 						</Group>
 					</Group>
 				</Container>
+
+				<Container size="md" h="100%"></Container>
 			</AppShell.Header>
-			{/* Navbar lateral apenas para mobile */}
 			{user && (
 				<AppShell.Navbar p="md">
 					<AppShell.Section>
@@ -106,18 +124,24 @@ export function AppLayout({ children, showUserMenu = true }: AppLayoutProps) {
 					<AppShell.Section grow component={ScrollArea}>
 						<Stack gap={0}>
 							{navigationItems.map((item) => (
-								<NavLink
+								<UnstyledButton
 									key={item.href}
+									size="compact-md"
 									component="button"
-									label={item.label}
-									leftSection={<item.icon size={16} />}
-									active={item.active}
-									variant={item.active ? "filled" : "subtle"}
+									style={{
+										color: item.active
+											? "var(--mantine-color-dimmed)"
+											: "var(--mantine-color-text)",
+										cursor: item.active ? "default" : "pointer",
+									}}
+									disabled={item.active}
 									onClick={() => {
 										router.push(item.href);
-										toggleMobile(); // Fechar navbar no mobile após navegação
+										toggleMobile();
 									}}
-								/>
+								>
+									{item.label}
+								</UnstyledButton>
 							))}
 						</Stack>
 					</AppShell.Section>
@@ -128,7 +152,7 @@ export function AppLayout({ children, showUserMenu = true }: AppLayoutProps) {
 						</Text>
 					</AppShell.Section>
 				</AppShell.Navbar>
-			)}
+			)}{" "}
 			<AppShell.Main>
 				<Container size="md">
 					<Stack gap="md">
