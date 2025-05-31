@@ -85,12 +85,12 @@ export const PatientFormFields = memo(function PatientFormFields({
 				placeholder="Digite o nome completo"
 				disabled={disabled}
 				{...form.getInputProps("full_name")}
-			/>{" "}
+			/>
 			<Grid gutter="md">
-				{" "}
 				<Grid.Col span={{ base: 12, sm: 6 }}>
 					<Input.Wrapper label="CPF" error={form.errors.cpf}>
 						<Input
+							error={form.errors.cpf}
 							component={IMaskInput}
 							mask="000.000.000-00"
 							placeholder="Digite o CPF"
@@ -113,9 +113,10 @@ export const PatientFormFields = memo(function PatientFormFields({
 						{...form.getInputProps("birth_date")}
 					/>
 				</Grid.Col>
-			</Grid>{" "}
+			</Grid>
 			<Input.Wrapper label="Telefone" error={form.errors.phone}>
 				<Input
+					error={form.errors.phone}
 					component={IMaskInput}
 					mask={[{ mask: "(00) 0000-0000" }, { mask: "(00) 00000-0000" }]}
 					placeholder="Digite o telefone"
@@ -129,10 +130,10 @@ export const PatientFormFields = memo(function PatientFormFields({
 				/>
 			</Input.Wrapper>
 			<Grid gutter="md">
-				{" "}
 				<Grid.Col span={{ base: 12, sm: 4 }}>
 					<Input.Wrapper label="CEP" error={form.errors.cep}>
 						<Input
+							error={form.errors.cep}
 							component={IMaskInput}
 							mask="00000-000"
 							placeholder="Digite o CEP"
