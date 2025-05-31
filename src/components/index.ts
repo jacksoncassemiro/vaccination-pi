@@ -10,5 +10,7 @@ export * from "./PatientFormFields";
 export * from "./PatientsTable";
 export * from "./ThemeToggle";
 export * from "./UserMenu";
+export * from "./VaccinationFormFields";
+export * from "./VaccinationsTable";
 export * from "./VaccineFormFields";
 export * from "./VaccinesTable";

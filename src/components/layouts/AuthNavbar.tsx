@@ -2,7 +2,7 @@
 
 import { ScrollArea, Stack, Text, UnstyledButton } from "@mantine/core";
 import { usePathname, useRouter } from "next/navigation";
-import { FaHome, FaUsers } from "react-icons/fa";
+import { FaHome, FaSyringe, FaUsers } from "react-icons/fa";
 import { MdSecurity } from "react-icons/md";
 
 /**
@@ -30,6 +30,12 @@ export function AuthNavbar() {
 			href: "/vaccines",
 			icon: MdSecurity,
 			active: pathname.startsWith("/vaccines"),
+		},
+		{
+			label: "Vacinações",
+			href: "/vaccinations",
+			icon: FaSyringe,
+			active: pathname.startsWith("/vaccinations"),
 		},
 	];
 
@@ -98,6 +104,12 @@ export function AuthDesktopNav() {
 			href: "/vaccines",
 			icon: MdSecurity,
 			active: pathname.startsWith("/vaccines"),
+		},
+		{
+			label: "Vacinações",
+			href: "/vaccinations",
+			icon: FaSyringe,
+			active: pathname.startsWith("/vaccinations"),
 		},
 	];
 
