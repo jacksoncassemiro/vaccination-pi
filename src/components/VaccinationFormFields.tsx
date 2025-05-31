@@ -6,7 +6,9 @@ import {
 } from "@/app/(authenticated)/vaccinations/actions";
 import { type VaccinationFormData } from "@/schemas/vaccinationSchema";
 import { Grid, Select, Stack, TextInput, Textarea } from "@mantine/core";
+import { DatePickerInput } from "@mantine/dates";
 import { type UseFormReturnType } from "@mantine/form";
+import { useDebouncedCallback } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 
 interface VaccinationFormFieldsProps {
@@ -34,24 +36,65 @@ export function VaccinationFormFields({
 	const [vaccines, setVaccines] = useState<Vaccine[]>([]);
 	const [loading, setLoading] = useState(true);
 
+	// Estados de busca para cada select
+	const [patientSearchTerm, setPatientSearchTerm] = useState("");
+	const [vaccineSearchTerm, setVaccineSearchTerm] = useState("");
+
+	// Callbacks de busca com debounce
+	const debouncedPatientSearch = useDebouncedCallback(
+		async (searchTerm: string) => {
+			try {
+				const searchResults = await getUserPatients(searchTerm, 10);
+				setPatients(searchResults);
+			} catch (error) {
+				console.error("Erro ao buscar pacientes:", error);
+			}
+		},
+		300
+	);
+
+	const debouncedVaccineSearch = useDebouncedCallback(
+		async (searchTerm: string) => {
+			try {
+				const searchResults = await getUserVaccines(searchTerm, 10);
+				setVaccines(searchResults);
+			} catch (error) {
+				console.error("Erro ao buscar vacinas:", error);
+			}
+		},
+		300
+	);
+
+	// Carregar dados iniciais (primeiros 10 registros)
 	useEffect(() => {
-		const fetchData = async () => {
+		const fetchInitialData = async () => {
 			try {
 				const [patientsData, vaccinesData] = await Promise.all([
-					getUserPatients(),
-					getUserVaccines(),
+					getUserPatients("", 10), // Buscar os primeiros 10 pacientes
+					getUserVaccines("", 10), // Buscar as primeiras 10 vacinas
 				]);
 				setPatients(patientsData);
 				setVaccines(vaccinesData);
 			} catch (error) {
-				console.error("Erro ao carregar dados:", error);
+				console.error("Erro ao carregar dados iniciais:", error);
 			} finally {
 				setLoading(false);
 			}
 		};
 
-		fetchData();
+		fetchInitialData();
 	}, []);
+
+	// Handlers para mudanças de busca
+	const handlePatientSearchChange = (searchTerm: string) => {
+		setPatientSearchTerm(searchTerm);
+		debouncedPatientSearch(searchTerm);
+	};
+
+	const handleVaccineSearchChange = (searchTerm: string) => {
+		setVaccineSearchTerm(searchTerm);
+		debouncedVaccineSearch(searchTerm);
+	};
 
 	const patientOptions = patients.map((patient) => ({
 		value: patient.id,
@@ -66,23 +109,36 @@ export function VaccinationFormFields({
 	return (
 		<Stack gap="md">
 			<Grid>
+				{" "}
 				<Grid.Col span={{ base: 12, sm: 6 }}>
+					{" "}
 					<Select
 						label="Paciente"
-						placeholder="Selecione o paciente..."
+						placeholder="Busque e selecione o paciente..."
 						data={patientOptions}
 						disabled={disabled || loading}
 						searchable
+						searchValue={patientSearchTerm}
+						onSearchChange={handlePatientSearchChange}
+						nothingFoundMessage="Nenhum paciente encontrado..."
+						clearable
+						allowDeselect
 						{...form.getInputProps("patient_id")}
 					/>
 				</Grid.Col>
 				<Grid.Col span={{ base: 12, sm: 6 }}>
+					{" "}
 					<Select
 						label="Vacina"
-						placeholder="Selecione a vacina..."
+						placeholder="Busque e selecione a vacina..."
 						data={vaccineOptions}
 						disabled={disabled || loading}
 						searchable
+						searchValue={vaccineSearchTerm}
+						onSearchChange={handleVaccineSearchChange}
+						nothingFoundMessage="Nenhuma vacina encontrada..."
+						clearable
+						allowDeselect
 						{...form.getInputProps("vaccine_id")}
 					/>
 				</Grid.Col>
@@ -90,9 +146,11 @@ export function VaccinationFormFields({
 
 			<Grid>
 				<Grid.Col span={{ base: 12, sm: 6 }}>
-					<TextInput
+					{" "}
+					<DatePickerInput
 						label="Data da Dose"
-						type="date"
+						placeholder="Selecione a data da vacinação"
+						valueFormat="DD/MM/YYYY"
 						disabled={disabled}
 						{...form.getInputProps("dose_date")}
 					/>

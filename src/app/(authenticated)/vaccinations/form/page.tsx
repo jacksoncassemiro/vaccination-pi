@@ -1,6 +1,6 @@
 "use client";
 
-import { AppAuthLayout, VaccinationFormFields } from "@/components";
+import { VaccinationFormFields } from "@/components";
 import {
 	vaccinationSchema,
 	type VaccinationFormData,
@@ -23,13 +23,12 @@ export default function VaccinationFormPage() {
 	const searchParams = useSearchParams();
 	const vaccinationId = searchParams.get("id");
 	const [isPending, startTransition] = useTransition();
-
 	const form = useForm<VaccinationFormData>({
 		validate: zodResolver(vaccinationSchema),
 		initialValues: {
 			patient_id: "",
 			vaccine_id: "",
-			dose_date: "",
+			dose_date: new Date(), // Usar data atual como padrão
 			batch_number: "",
 			location: "",
 			notes: "",
@@ -42,13 +41,12 @@ export default function VaccinationFormPage() {
 			const fetchData = async () => {
 				try {
 					const vaccinationToEdit = await getVaccinationById(vaccinationId);
-
 					form.setValues({
 						patient_id: vaccinationToEdit.patient_id || "",
 						vaccine_id: vaccinationToEdit.vaccine_id || "",
 						dose_date: vaccinationToEdit.dose_date
-							? vaccinationToEdit.dose_date.split("T")[0]
-							: "",
+							? new Date(vaccinationToEdit.dose_date)
+							: new Date(),
 						batch_number: vaccinationToEdit.batch_number || "",
 						location: vaccinationToEdit.location || "",
 						notes: vaccinationToEdit.notes || "",
@@ -79,7 +77,10 @@ export default function VaccinationFormPage() {
 				const formData = new FormData();
 				formData.append("patient_id", values.patient_id);
 				formData.append("vaccine_id", values.vaccine_id);
-				formData.append("dose_date", values.dose_date);
+				formData.append(
+					"dose_date",
+					values.dose_date.toISOString().split("T")[0]
+				);
 				formData.append("batch_number", values.batch_number);
 				formData.append("location", values.location);
 				if (values.notes) {
@@ -140,30 +141,28 @@ export default function VaccinationFormPage() {
 	const pageTitle = isEditing ? "Editar Vacinação" : "Nova Vacinação";
 
 	return (
-		<AppAuthLayout>
-			<Stack gap="lg" py="md">
-				<Group justify="space-between" align="center">
-					<Title order={2}>{pageTitle}</Title>
-					<Button
-						variant="outline"
-						leftSection={<FaArrowLeft size={16} />}
-						onClick={handleBack}
-					>
-						Voltar
+		<Stack gap="lg" py="md">
+			<Group justify="space-between" align="center">
+				<Title order={2}>{pageTitle}</Title>
+				<Button
+					variant="outline"
+					leftSection={<FaArrowLeft size={16} />}
+					onClick={handleBack}
+				>
+					Voltar
+				</Button>
+			</Group>
+
+			<form onSubmit={form.onSubmit(handleSubmit)}>
+				<Stack gap="md">
+					<VaccinationFormFields form={form} disabled={isPending} />
+				</Stack>
+				<Group justify="flex-end" mt="xl">
+					<Button type="submit" loading={isPending} size="md">
+						{isEditing ? "Atualizar" : "Registrar"} Vacinação
 					</Button>
 				</Group>
-
-				<form onSubmit={form.onSubmit(handleSubmit)}>
-					<Stack gap="md">
-						<VaccinationFormFields form={form} disabled={isPending} />
-					</Stack>
-					<Group justify="flex-end" mt="xl">
-						<Button type="submit" loading={isPending} size="md">
-							{isEditing ? "Atualizar" : "Registrar"} Vacinação
-						</Button>
-					</Group>
-				</form>
-			</Stack>
-		</AppAuthLayout>
+			</form>
+		</Stack>
 	);
 }

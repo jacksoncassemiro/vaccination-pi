@@ -10,15 +10,19 @@ export const vaccinationSchema = z.object({
 		.string()
 		.min(1, "Vacina é obrigatória")
 		.uuid("ID da vacina deve ser um UUID válido"),
-
-	dose_date: z
-		.string()
-		.min(1, "Data da dose é obrigatória")
+	dose_date: z.coerce
+		.date({
+			errorMap: (issue, { defaultError }) => ({
+				message:
+					issue.code === "invalid_date"
+						? "Data da dose inválida"
+						: defaultError,
+			}),
+		})
 		.refine((date) => {
-			const parsedDate = new Date(date);
 			const today = new Date();
 			today.setHours(23, 59, 59, 999); // Permitir até o final do dia atual
-			return parsedDate <= today && parsedDate >= new Date("1900-01-01");
+			return date <= today && date >= new Date("1900-01-01");
 		}, "Data da dose deve ser válida e não pode ser futura"),
 
 	batch_number: z

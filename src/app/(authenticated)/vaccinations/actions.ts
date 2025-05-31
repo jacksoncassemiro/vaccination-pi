@@ -8,6 +8,11 @@ import type {
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
+// Tipo específico para as actions que recebem FormData (dose_date como string)
+type VaccinationActionData = Omit<VaccinationFormData, "dose_date"> & {
+	dose_date: string;
+};
+
 export async function getVaccinations(
 	filters: VaccinationsSearchFilters = {}
 ): Promise<VaccinationsResponse> {
@@ -39,7 +44,7 @@ export async function getVaccinations(
 			patient.full_name.ilike.%${search}%,
 			patient.cpf.ilike.%${search}%,
 			vaccine.type.ilike.%${search}%,
-			vaccine.manufacturer.ilike.%${search}%
+			vaccine.manufacturer.ilike.%${search}%,
 		`);
 	}
 
@@ -98,7 +103,7 @@ export async function createVaccination(formData: FormData) {
 	const supabase = await createClient();
 
 	// Extrair dados do FormData
-	const vaccinationData: VaccinationFormData = {
+	const vaccinationData: VaccinationActionData = {
 		patient_id: formData.get("patient_id") as string,
 		vaccine_id: formData.get("vaccine_id") as string,
 		dose_date: formData.get("dose_date") as string,
@@ -169,7 +174,7 @@ export async function updateVaccination(id: string, formData: FormData) {
 	const supabase = await createClient();
 
 	// Extrair dados do FormData
-	const vaccinationData: VaccinationFormData = {
+	const vaccinationData: VaccinationActionData = {
 		patient_id: formData.get("patient_id") as string,
 		vaccine_id: formData.get("vaccine_id") as string,
 		dose_date: formData.get("dose_date") as string,
@@ -305,7 +310,7 @@ export async function deleteVaccination(id: string) {
 }
 
 // Função auxiliar para buscar pacientes do usuário (para o formulário)
-export async function getUserPatients() {
+export async function getUserPatients(search: string = "", limit: number = 50) {
 	const supabase = await createClient();
 
 	const {
@@ -317,11 +322,18 @@ export async function getUserPatients() {
 		throw new Error("Usuário não autenticado");
 	}
 
-	const { data, error } = await supabase
+	let query = supabase
 		.from("patients")
 		.select("id, full_name, cpf")
-		.eq("user_id", user.id)
-		.order("full_name");
+		.eq("user_id", user.id);
+
+	// Aplicar busca se fornecida
+	if (search.trim()) {
+		query = query.or(`full_name.ilike.%${search}%,cpf.ilike.%${search}%`);
+	}
+
+	// Aplicar limite e ordenação
+	const { data, error } = await query.order("full_name").limit(limit);
 
 	if (error) {
 		throw new Error(`Erro ao buscar pacientes: ${error.message}`);
@@ -331,7 +343,7 @@ export async function getUserPatients() {
 }
 
 // Função auxiliar para buscar vacinas do usuário (para o formulário)
-export async function getUserVaccines() {
+export async function getUserVaccines(search: string = "", limit: number = 50) {
 	const supabase = await createClient();
 
 	const {
@@ -343,11 +355,18 @@ export async function getUserVaccines() {
 		throw new Error("Usuário não autenticado");
 	}
 
-	const { data, error } = await supabase
+	let query = supabase
 		.from("vaccine_catalog")
 		.select("id, type, manufacturer")
-		.eq("user_id", user.id)
-		.order("type");
+		.eq("user_id", user.id);
+
+	// Aplicar busca se fornecida
+	if (search.trim()) {
+		query = query.or(`type.ilike.%${search}%,manufacturer.ilike.%${search}%`);
+	}
+
+	// Aplicar limite e ordenação
+	const { data, error } = await query.order("type").limit(limit);
 
 	if (error) {
 		throw new Error(`Erro ao buscar vacinas: ${error.message}`);

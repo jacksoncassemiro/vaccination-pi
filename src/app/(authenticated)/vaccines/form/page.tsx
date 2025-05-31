@@ -1,6 +1,5 @@
 "use client";
 
-import { AppAuthLayout } from "@/components/AppAuthLayout";
 import { VaccineFormFields } from "@/components/VaccineFormFields";
 import { vaccineSchema, type VaccineFormData } from "@/schemas/vaccineSchema";
 import { Button, Group, Stack, Title } from "@mantine/core";
@@ -115,30 +114,28 @@ export default function VaccineFormPage() {
 	const isEditing = !!vaccineId;
 	const pageTitle = isEditing ? "Editar Vacina" : "Nova Vacina";
 	return (
-		<AppAuthLayout>
-			<Stack gap="lg" py="md">
-				<Group justify="space-between" align="center">
-					<Title order={2}>{pageTitle}</Title>
-					<Button
-						variant="outline"
-						leftSection={<FaArrowLeft size={16} />}
-						onClick={handleBack}
-					>
-						Voltar
+		<Stack gap="lg" py="md">
+			<Group justify="space-between" align="center">
+				<Title order={2}>{pageTitle}</Title>
+				<Button
+					variant="outline"
+					leftSection={<FaArrowLeft size={16} />}
+					onClick={handleBack}
+				>
+					Voltar
+				</Button>
+			</Group>
+
+			<form onSubmit={form.onSubmit(handleSubmit)}>
+				<Stack gap="md">
+					<VaccineFormFields form={form} disabled={isPending} />
+				</Stack>
+				<Group justify="flex-end" mt="xl">
+					<Button type="submit" loading={isPending} size="md">
+						{isEditing ? "Atualizar" : "Cadastrar"} Vacina
 					</Button>
 				</Group>
-
-				<form onSubmit={form.onSubmit(handleSubmit)}>
-					<Stack gap="md">
-						<VaccineFormFields form={form} disabled={isPending} />
-					</Stack>
-					<Group justify="flex-end" mt="xl">
-						<Button type="submit" loading={isPending} size="md">
-							{isEditing ? "Atualizar" : "Cadastrar"} Vacina
-						</Button>
-					</Group>
-				</form>
-			</Stack>
-		</AppAuthLayout>
+			</form>
+		</Stack>
 	);
 }

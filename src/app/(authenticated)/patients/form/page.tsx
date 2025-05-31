@@ -1,6 +1,5 @@
 "use client";
 
-import { AppAuthLayout } from "@/components/AppAuthLayout";
 import { PatientFormFields } from "@/components/PatientFormFields";
 import { fetchAddressByCep } from "@/lib/viaCep";
 import { patientSchema, type PatientFormData } from "@/schemas/patientSchema";
@@ -203,35 +202,33 @@ export default function PatientFormPage() {
 	};
 
 	return (
-		<AppAuthLayout>
-			<Stack gap="lg" py="md">
-				<Group justify="space-between" align="center">
-					<Title order={2}>
-						{patientId ? "Editar Paciente" : "Novo Paciente"}
-					</Title>
-					<Button
-						variant="outline"
-						leftSection={<FaArrowLeft size={16} />}
-						onClick={() => router.push("/patients")}
-					>
-						Voltar
+		<Stack gap="lg" py="md">
+			<Group justify="space-between" align="center">
+				<Title order={2}>
+					{patientId ? "Editar Paciente" : "Novo Paciente"}
+				</Title>
+				<Button
+					variant="outline"
+					leftSection={<FaArrowLeft size={16} />}
+					onClick={() => router.push("/patients")}
+				>
+					Voltar
+				</Button>
+			</Group>
+			<form onSubmit={form.onSubmit(handleSubmit)}>
+				<Stack gap="md">
+					<PatientFormFields
+						form={form}
+						disabled={isPending}
+						onCepChange={handleCepChange}
+					/>
+				</Stack>
+				<Group justify="flex-end" mt="xl">
+					<Button type="submit" loading={isPending} size="md">
+						{patientId ? "Atualizar" : "Cadastrar"} Paciente
 					</Button>
 				</Group>
-				<form onSubmit={form.onSubmit(handleSubmit)}>
-					<Stack gap="md">
-						<PatientFormFields
-							form={form}
-							disabled={isPending}
-							onCepChange={handleCepChange}
-						/>
-					</Stack>
-					<Group justify="flex-end" mt="xl">
-						<Button type="submit" loading={isPending} size="md">
-							{patientId ? "Atualizar" : "Cadastrar"} Paciente
-						</Button>
-					</Group>
-				</form>
-			</Stack>
-		</AppAuthLayout>
+			</form>
+		</Stack>
 	);
 }
