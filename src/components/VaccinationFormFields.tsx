@@ -50,10 +50,14 @@ export function VaccinationFormFields({
 	// Estados de loading para feedback visual
 	const [searchingPatients, setSearchingPatients] = useState(false);
 	const [searchingVaccines, setSearchingVaccines] = useState(false);
-
 	// Callbacks de busca com debounce
 	const debouncedPatientSearch = useDebouncedCallback(
 		async (searchTerm: string) => {
+			// Só busca se há um termo de pesquisa não vazio
+			if (!searchTerm.trim()) {
+				return;
+			}
+
 			setSearchingPatients(true);
 			try {
 				const searchResults = await getUserPatients(searchTerm, 10);
@@ -68,6 +72,11 @@ export function VaccinationFormFields({
 	);
 	const debouncedVaccineSearch = useDebouncedCallback(
 		async (searchTerm: string) => {
+			// Só busca se há um termo de pesquisa não vazio
+			if (!searchTerm.trim()) {
+				return;
+			}
+
 			setSearchingVaccines(true);
 			try {
 				const searchResults = await getUserVaccines(searchTerm, 10);
@@ -100,15 +109,28 @@ export function VaccinationFormFields({
 
 		fetchInitialData();
 	}, []);
-
 	// Handlers para mudanças de busca
 	const handlePatientSearchChange = (searchTerm: string) => {
 		setPatientSearchTerm(searchTerm);
+
+		// Se o campo foi limpo, restaura os dados iniciais
+		if (!searchTerm.trim()) {
+			getUserPatients("", 10).then(setPatients);
+			return;
+		}
+
 		debouncedPatientSearch(searchTerm);
 	};
 
 	const handleVaccineSearchChange = (searchTerm: string) => {
 		setVaccineSearchTerm(searchTerm);
+
+		// Se o campo foi limpo, restaura os dados iniciais
+		if (!searchTerm.trim()) {
+			getUserVaccines("", 10).then(setVaccines);
+			return;
+		}
+
 		debouncedVaccineSearch(searchTerm);
 	};
 
