@@ -12,7 +12,7 @@ import {
 	UnstyledButton,
 } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { Home, Users } from "lucide-react";
+import { Home, Shield, Users } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 import { ReactNode } from "react";
 import { ConnectionStatus } from "./ConnectionStatus";
@@ -32,7 +32,6 @@ export function AppLayout({ children, showUserMenu = true }: AppLayoutProps) {
 	const handleTitleClick = () => {
 		router.push("/");
 	};
-
 	const navigationItems = [
 		{
 			label: "Início",
@@ -45,6 +44,12 @@ export function AppLayout({ children, showUserMenu = true }: AppLayoutProps) {
 			href: "/patients",
 			icon: Users,
 			active: pathname.startsWith("/patients"),
+		},
+		{
+			label: "Vacinas",
+			href: "/vaccines",
+			icon: Shield,
+			active: pathname.startsWith("/vaccines"),
 		},
 	];
 
@@ -81,37 +86,35 @@ export function AppLayout({ children, showUserMenu = true }: AppLayoutProps) {
 								</Text>
 							</UnstyledButton>
 						</Group>
-
-						<Group gap={8} visibleFrom="sm">
-							{navigationItems.map((item) => (
-								<UnstyledButton
-									key={item.href}
-									size="compact-md"
-									component="button"
-									style={{
-										color: item.active
-											? "var(--mantine-color-dimmed)"
-											: "var(--mantine-color-text)",
-										cursor: item.active ? "default" : "pointer",
-									}}
-									disabled={item.active}
-									onClick={() => {
-										router.push(item.href);
-										toggleMobile();
-									}}
-								>
-									{item.label}
-								</UnstyledButton>
-							))}
-						</Group>
-
+						{user && (
+							<Group gap={8} visibleFrom="sm">
+								{navigationItems.map((item) => (
+									<UnstyledButton
+										key={item.href}
+										size="compact-md"
+										component="button"
+										style={{
+											color: item.active
+												? "var(--mantine-color-dimmed)"
+												: "var(--mantine-color-text)",
+											cursor: item.active ? "default" : "pointer",
+										}}
+										disabled={item.active}
+										onClick={() => {
+											router.push(item.href);
+											toggleMobile();
+										}}
+									>
+										{item.label}
+									</UnstyledButton>
+								))}
+							</Group>
+						)}
 						<Group gap="xs" align="center">
 							{showUserMenu && user && <UserMenu />}
 						</Group>
 					</Group>
 				</Container>
-
-				<Container size="md" h="100%"></Container>
 			</AppShell.Header>
 			{user && (
 				<AppShell.Navbar p="md">

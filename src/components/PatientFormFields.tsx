@@ -1,3 +1,5 @@
+"use client";
+
 import type { PatientFormData } from "@/schemas/patientSchema";
 import { Grid, Input, Select, TextInput } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
