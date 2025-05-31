@@ -6,7 +6,7 @@ import {
 	useComputedColorScheme,
 	useMantineColorScheme,
 } from "@mantine/core";
-import { Monitor, Moon, Sun } from "lucide-react";
+import { FaDesktop, FaMoon, FaSun } from "react-icons/fa";
 
 interface ThemeToggleProps {
 	size?: "xs" | "sm" | "md" | "lg" | "xl";
@@ -39,16 +39,15 @@ export function ThemeToggle({
 			setColorScheme("light");
 		}
 	};
-
 	// Determina qual ícone mostrar baseado no esquema atual
 	const getIcon = () => {
 		if (colorScheme === "auto") {
-			return <Monitor size={16} />;
+			return <FaDesktop size={16} />;
 		}
 		return computedColorScheme === "dark" ? (
-			<Sun size={16} />
+			<FaSun size={16} />
 		) : (
-			<Moon size={16} />
+			<FaMoon size={16} />
 		);
 	};
 

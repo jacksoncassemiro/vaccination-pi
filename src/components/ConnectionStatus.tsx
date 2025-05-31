@@ -2,8 +2,9 @@
 
 import { useOnlineStatus } from "@/hooks/useOnlineStatus";
 import { Alert, Group, Text } from "@mantine/core";
-import { Wifi, WifiOff } from "lucide-react";
 import { memo } from "react";
+import { FaWifi } from "react-icons/fa";
+import { MdWifiOff } from "react-icons/md";
 
 interface ConnectionStatusProps {
 	showWhenOnline?: boolean;
@@ -27,7 +28,7 @@ export const ConnectionStatus = memo(function ConnectionStatus({
 	return (
 		<Alert
 			color={isOnline ? "green" : "red"}
-			icon={isOnline ? <Wifi size={16} /> : <WifiOff size={16} />}
+			icon={isOnline ? <FaWifi size={16} /> : <MdWifiOff size={16} />}
 			variant="light"
 		>
 			<Group gap="xs">

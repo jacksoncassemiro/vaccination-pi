@@ -12,9 +12,9 @@ import {
 	TextInput,
 	Title,
 } from "@mantine/core";
-import { FileDown, Plus, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
+import { FaFileDownload, FaPlus, FaSearch } from "react-icons/fa";
 import { deleteVaccine, getVaccines } from "./actions";
 
 export default function VaccinesPage() {
@@ -102,13 +102,16 @@ export default function VaccinesPage() {
 					<Group>
 						<Button
 							variant="outline"
-							leftSection={<FileDown size={16} />}
+							leftSection={<FaFileDownload size={16} />}
 							onClick={handleExportToPdf}
 							disabled={vaccines.data.length === 0}
 						>
 							Exportar PDF
 						</Button>
-						<Button leftSection={<Plus size={16} />} onClick={handleAddVaccine}>
+						<Button
+							leftSection={<FaPlus size={16} />}
+							onClick={handleAddVaccine}
+						>
 							Nova Vacina
 						</Button>
 					</Group>
@@ -119,7 +122,7 @@ export default function VaccinesPage() {
 				<Group align="end">
 					<TextInput
 						placeholder="Buscar por tipo ou fabricante..."
-						leftSection={<Search size={16} />}
+						leftSection={<FaSearch size={16} />}
 						value={search}
 						onChange={(event) => setSearch(event.currentTarget.value)}
 						style={{ flex: 1 }}

@@ -12,9 +12,9 @@ import {
 	TextInput,
 	Title,
 } from "@mantine/core";
-import { FileDown, Plus, Search } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
+import { FaFileDownload, FaPlus, FaSearch } from "react-icons/fa";
 import { deletePatient, getPatients } from "./actions";
 
 export default function PatientsPage() {
@@ -99,13 +99,16 @@ export default function PatientsPage() {
 					<Group>
 						<Button
 							variant="outline"
-							leftSection={<FileDown size={16} />}
+							leftSection={<FaFileDownload size={16} />}
 							onClick={handleExportToPdf}
 							disabled={patients.data.length === 0}
 						>
 							Exportar PDF
 						</Button>
-						<Button leftSection={<Plus size={16} />} onClick={handleAddPatient}>
+						<Button
+							leftSection={<FaPlus size={16} />}
+							onClick={handleAddPatient}
+						>
 							Novo Paciente
 						</Button>
 					</Group>
@@ -116,7 +119,7 @@ export default function PatientsPage() {
 				<Group align="end">
 					<TextInput
 						placeholder="Buscar por nome, CPF ou telefone..."
-						leftSection={<Search size={16} />}
+						leftSection={<FaSearch size={16} />}
 						value={search}
 						onChange={(event) => setSearch(event.currentTarget.value)}
 						style={{ flex: 1 }}

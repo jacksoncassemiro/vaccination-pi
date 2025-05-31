@@ -1,7 +1,7 @@
 "use client";
 
-import { AlertTriangle, RefreshCw } from "lucide-react";
 import { useEffect } from "react";
+import { FaExclamationTriangle, FaRedo } from "react-icons/fa";
 
 export default function GlobalError({
 	error,
@@ -42,7 +42,7 @@ export default function GlobalError({
 								justifyContent: "center",
 							}}
 						>
-							<AlertTriangle size={64} />
+							<FaExclamationTriangle size={64} />
 						</div>
 						<h1
 							style={{
@@ -94,7 +94,7 @@ export default function GlobalError({
 								gap: "0.5rem",
 							}}
 						>
-							<RefreshCw size={16} />
+							<FaRedo size={16} />
 							Tentar novamente
 						</button>
 					</div>

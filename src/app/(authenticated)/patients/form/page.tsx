@@ -1,6 +1,6 @@
 "use client";
 
-import { AppLayout } from "@/components/AppAuthLayout";
+import { AppAuthLayout } from "@/components/AppAuthLayout";
 import { PatientFormFields } from "@/components/PatientFormFields";
 import { fetchAddressByCep } from "@/lib/viaCep";
 import { patientSchema, type PatientFormData } from "@/schemas/patientSchema";
@@ -8,10 +8,10 @@ import { Button, Group, Stack, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDebouncedCallback } from "@mantine/hooks";
 import { notifications } from "@mantine/notifications";
-import { ArrowLeft } from "lucide-react";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
+import { FaArrowLeft } from "react-icons/fa";
 import { createPatient, getPatientById, updatePatient } from "../actions";
 
 export default function PatientFormPage() {
@@ -203,7 +203,7 @@ export default function PatientFormPage() {
 	};
 
 	return (
-		<AppLayout>
+		<AppAuthLayout>
 			<Stack gap="lg" py="md">
 				<Group justify="space-between" align="center">
 					<Title order={2}>
@@ -211,7 +211,7 @@ export default function PatientFormPage() {
 					</Title>
 					<Button
 						variant="outline"
-						leftSection={<ArrowLeft size={16} />}
+						leftSection={<FaArrowLeft size={16} />}
 						onClick={() => router.push("/patients")}
 					>
 						Voltar
@@ -232,6 +232,6 @@ export default function PatientFormPage() {
 					</Group>
 				</form>
 			</Stack>
-		</AppLayout>
+		</AppAuthLayout>
 	);
 }

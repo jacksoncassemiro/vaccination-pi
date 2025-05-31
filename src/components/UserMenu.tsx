@@ -10,7 +10,13 @@ import {
 	UnstyledButton,
 	useMantineColorScheme,
 } from "@mantine/core";
-import { ChevronDown, LogOut, Monitor, Moon, Sun } from "lucide-react";
+import {
+	FaChevronDown,
+	FaDesktop,
+	FaMoon,
+	FaSignOutAlt,
+	FaSun,
+} from "react-icons/fa";
 
 interface UserMenuProps {
 	className?: string;
@@ -56,7 +62,7 @@ function UserButton({ image, name, email, icon, ...others }: UserButtonProps) {
 					</Text>
 				</div>
 
-				{icon || <ChevronDown size={14} />}
+				{icon || <FaChevronDown size={14} />}
 			</Group>
 		</UnstyledButton>
 	);
@@ -71,15 +77,14 @@ export function UserMenu({ className }: UserMenuProps) {
 	const handleThemeChange = (newScheme: "light" | "dark" | "auto") => {
 		setColorScheme(newScheme);
 	};
-
 	const getThemeIcon = (scheme: "light" | "dark" | "auto") => {
 		switch (scheme) {
 			case "light":
-				return <Sun size={14} />;
+				return <FaSun size={14} />;
 			case "dark":
-				return <Moon size={14} />;
+				return <FaMoon size={14} />;
 			case "auto":
-				return <Monitor size={14} />;
+				return <FaDesktop size={14} />;
 		}
 	};
 
@@ -120,7 +125,6 @@ export function UserMenu({ className }: UserMenuProps) {
 					>
 						{getThemeLabel("light")}
 					</Menu.Item>
-
 					<Menu.Item
 						leftSection={getThemeIcon("dark")}
 						onClick={() => handleThemeChange("dark")}
@@ -128,7 +132,6 @@ export function UserMenu({ className }: UserMenuProps) {
 					>
 						{getThemeLabel("dark")}
 					</Menu.Item>
-
 					<Menu.Item
 						leftSection={getThemeIcon("auto")}
 						onClick={() => handleThemeChange("auto")}
@@ -136,12 +139,10 @@ export function UserMenu({ className }: UserMenuProps) {
 					>
 						{getThemeLabel("auto")}
 					</Menu.Item>
-
 					<Menu.Divider />
-
-					<Menu.Label>Conta</Menu.Label>
+					<Menu.Label>Conta</Menu.Label>{" "}
 					<Menu.Item
-						leftSection={<LogOut size={14} />}
+						leftSection={<FaSignOutAlt size={14} />}
 						color="red"
 						onClick={async () => {
 							await signOut();

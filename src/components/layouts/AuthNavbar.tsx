@@ -1,8 +1,9 @@
 "use client";
 
 import { ScrollArea, Stack, Text, UnstyledButton } from "@mantine/core";
-import { Home, Shield, Users } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
+import { FaHome, FaUsers } from "react-icons/fa";
+import { MdSecurity } from "react-icons/md";
 
 /**
  * Componente de navegação mobile para usuários autenticados.
@@ -15,19 +16,19 @@ export function AuthNavbar() {
 		{
 			label: "Início",
 			href: "/",
-			icon: Home,
+			icon: FaHome,
 			active: pathname === "/",
 		},
 		{
 			label: "Pacientes",
 			href: "/patients",
-			icon: Users,
+			icon: FaUsers,
 			active: pathname.startsWith("/patients"),
 		},
 		{
 			label: "Vacinas",
 			href: "/vaccines",
-			icon: Shield,
+			icon: MdSecurity,
 			active: pathname.startsWith("/vaccines"),
 		},
 	];
@@ -83,19 +84,19 @@ export function AuthDesktopNav() {
 		{
 			label: "Início",
 			href: "/",
-			icon: Home,
+			icon: FaHome,
 			active: pathname === "/",
 		},
 		{
 			label: "Pacientes",
 			href: "/patients",
-			icon: Users,
+			icon: FaUsers,
 			active: pathname.startsWith("/patients"),
 		},
 		{
 			label: "Vacinas",
 			href: "/vaccines",
-			icon: Shield,
+			icon: MdSecurity,
 			active: pathname.startsWith("/vaccines"),
 		},
 	];

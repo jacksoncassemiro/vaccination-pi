@@ -1,8 +1,8 @@
 "use client";
 
 import { Button, Container, Stack, Text, Title } from "@mantine/core";
-import { AlertTriangle, RefreshCw } from "lucide-react";
 import { useEffect } from "react";
+import { FaExclamationTriangle, FaRedo } from "react-icons/fa";
 
 export default function Error({
 	error,
@@ -19,7 +19,7 @@ export default function Error({
 	return (
 		<Container size="md" style={{ paddingTop: "2rem" }}>
 			<Stack align="center" gap="lg">
-				<AlertTriangle size={64} color="red" />
+				<FaExclamationTriangle size={64} color="red" />
 				<Title order={2} ta="center">
 					Algo deu errado!
 				</Title>
@@ -38,7 +38,7 @@ export default function Error({
 					</Text>
 				)}
 				<Button
-					leftSection={<RefreshCw size={16} />}
+					leftSection={<FaRedo size={16} />}
 					onClick={() => reset()}
 					variant="outline"
 				>

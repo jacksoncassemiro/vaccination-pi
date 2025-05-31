@@ -1,6 +1,6 @@
 import { Button, Container, Stack, Text, Title } from "@mantine/core";
-import { Home, Search } from "lucide-react";
 import Link from "next/link";
+import { FaHome, FaSearch } from "react-icons/fa";
 
 export default function NotFound() {
 	return (
@@ -24,7 +24,7 @@ export default function NotFound() {
 					<Button
 						component={Link}
 						href="/"
-						leftSection={<Home size={16} />}
+						leftSection={<FaHome size={16} />}
 						size="md"
 					>
 						Voltar ao início
@@ -32,7 +32,7 @@ export default function NotFound() {
 					<Button
 						component={Link}
 						href="/"
-						leftSection={<Search size={16} />}
+						leftSection={<FaSearch size={16} />}
 						variant="outline"
 						size="md"
 					>

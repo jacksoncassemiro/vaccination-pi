@@ -3,7 +3,7 @@
 import { LoadingScreen } from "@/components";
 import { useAuth } from "@/contexts";
 import { Button, Center, Paper, Stack, Text, Title } from "@mantine/core";
-import { Chrome } from "lucide-react";
+import { FaGoogle } from "react-icons/fa";
 import { signInWithGoogle } from "./actions";
 
 export default function AuthPage() {
@@ -29,11 +29,11 @@ export default function AuthPage() {
 						</Title>
 						<Text ta="center" c="dimmed" size="sm">
 							Use sua conta do Google para acessar o sistema
-						</Text>
+						</Text>{" "}
 						<form action={signInWithGoogle}>
 							<Button
 								fullWidth
-								leftSection={<Chrome size={18} />}
+								leftSection={<FaGoogle size={18} />}
 								variant="default"
 								type="submit"
 								size="md"

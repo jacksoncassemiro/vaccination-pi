@@ -14,7 +14,7 @@ import {
 } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import { notifications } from "@mantine/notifications";
-import { Edit, FileDown, Trash2 } from "lucide-react";
+import { FaEdit, FaFileDownload, FaTrash } from "react-icons/fa";
 
 interface PatientsTableProps {
 	patients: Patient[];
@@ -173,7 +173,7 @@ export function PatientsTable({
 													size="sm"
 													onClick={() => onEdit(patient)}
 												>
-													<Edit style={{ width: rem(16), height: rem(16) }} />
+													<FaEdit style={{ width: rem(16), height: rem(16) }} />
 												</ActionIcon>
 											</Tooltip>
 											{onExportPdf && (
@@ -184,7 +184,8 @@ export function PatientsTable({
 														size="sm"
 														onClick={() => onExportPdf(patient)}
 													>
-														<FileDown
+														{" "}
+														<FaFileDownload
 															style={{ width: rem(16), height: rem(16) }}
 														/>
 													</ActionIcon>
@@ -197,7 +198,9 @@ export function PatientsTable({
 													size="sm"
 													onClick={() => handleDelete(patient)}
 												>
-													<Trash2 style={{ width: rem(16), height: rem(16) }} />
+													<FaTrash
+														style={{ width: rem(16), height: rem(16) }}
+													/>
 												</ActionIcon>
 											</Tooltip>
 										</Group>

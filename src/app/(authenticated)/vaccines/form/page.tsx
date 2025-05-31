@@ -1,15 +1,15 @@
 "use client";
 
-import { AppLayout } from "@/components/AppAuthLayout";
+import { AppAuthLayout } from "@/components/AppAuthLayout";
 import { VaccineFormFields } from "@/components/VaccineFormFields";
 import { vaccineSchema, type VaccineFormData } from "@/schemas/vaccineSchema";
 import { Button, Group, Stack, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
-import { ArrowLeft } from "lucide-react";
 import { zodResolver } from "mantine-form-zod-resolver";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useTransition } from "react";
+import { FaArrowLeft } from "react-icons/fa";
 import { createVaccine, getVaccineById, updateVaccine } from "../actions";
 
 export default function VaccineFormPage() {
@@ -115,13 +115,13 @@ export default function VaccineFormPage() {
 	const isEditing = !!vaccineId;
 	const pageTitle = isEditing ? "Editar Vacina" : "Nova Vacina";
 	return (
-		<AppLayout>
+		<AppAuthLayout>
 			<Stack gap="lg" py="md">
 				<Group justify="space-between" align="center">
 					<Title order={2}>{pageTitle}</Title>
 					<Button
 						variant="outline"
-						leftSection={<ArrowLeft size={16} />}
+						leftSection={<FaArrowLeft size={16} />}
 						onClick={handleBack}
 					>
 						Voltar
@@ -139,6 +139,6 @@ export default function VaccineFormPage() {
 					</Group>
 				</form>
 			</Stack>
-		</AppLayout>
+		</AppAuthLayout>
 	);
 }
