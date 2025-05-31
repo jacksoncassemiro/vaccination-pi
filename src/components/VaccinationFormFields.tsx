@@ -5,7 +5,14 @@ import {
 	getUserVaccines,
 } from "@/app/(authenticated)/vaccinations/actions";
 import { type VaccinationFormData } from "@/schemas/vaccinationSchema";
-import { Grid, Select, Stack, TextInput, Textarea } from "@mantine/core";
+import {
+	Grid,
+	Loader,
+	Select,
+	Stack,
+	TextInput,
+	Textarea,
+} from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { type UseFormReturnType } from "@mantine/form";
 import { useDebouncedCallback } from "@mantine/hooks";
@@ -40,26 +47,35 @@ export function VaccinationFormFields({
 	const [patientSearchTerm, setPatientSearchTerm] = useState("");
 	const [vaccineSearchTerm, setVaccineSearchTerm] = useState("");
 
+	// Estados de loading para feedback visual
+	const [searchingPatients, setSearchingPatients] = useState(false);
+	const [searchingVaccines, setSearchingVaccines] = useState(false);
+
 	// Callbacks de busca com debounce
 	const debouncedPatientSearch = useDebouncedCallback(
 		async (searchTerm: string) => {
+			setSearchingPatients(true);
 			try {
 				const searchResults = await getUserPatients(searchTerm, 10);
 				setPatients(searchResults);
 			} catch (error) {
 				console.error("Erro ao buscar pacientes:", error);
+			} finally {
+				setSearchingPatients(false);
 			}
 		},
 		300
 	);
-
 	const debouncedVaccineSearch = useDebouncedCallback(
 		async (searchTerm: string) => {
+			setSearchingVaccines(true);
 			try {
 				const searchResults = await getUserVaccines(searchTerm, 10);
 				setVaccines(searchResults);
 			} catch (error) {
 				console.error("Erro ao buscar vacinas:", error);
+			} finally {
+				setSearchingVaccines(false);
 			}
 		},
 		300
@@ -109,9 +125,7 @@ export function VaccinationFormFields({
 	return (
 		<Stack gap="md">
 			<Grid>
-				{" "}
 				<Grid.Col span={{ base: 12, sm: 6 }}>
-					{" "}
 					<Select
 						label="Paciente"
 						placeholder="Busque e selecione o paciente..."
@@ -120,14 +134,18 @@ export function VaccinationFormFields({
 						searchable
 						searchValue={patientSearchTerm}
 						onSearchChange={handlePatientSearchChange}
-						nothingFoundMessage="Nenhum paciente encontrado..."
+						nothingFoundMessage={
+							searchingPatients
+								? "Pesquisando pacientes..."
+								: "Nenhum paciente encontrado..."
+						}
+						rightSection={searchingPatients ? <Loader size="xs" /> : undefined}
 						clearable
 						allowDeselect
 						{...form.getInputProps("patient_id")}
 					/>
 				</Grid.Col>
 				<Grid.Col span={{ base: 12, sm: 6 }}>
-					{" "}
 					<Select
 						label="Vacina"
 						placeholder="Busque e selecione a vacina..."
@@ -136,7 +154,12 @@ export function VaccinationFormFields({
 						searchable
 						searchValue={vaccineSearchTerm}
 						onSearchChange={handleVaccineSearchChange}
-						nothingFoundMessage="Nenhuma vacina encontrada..."
+						nothingFoundMessage={
+							searchingVaccines
+								? "Pesquisando vacinas..."
+								: "Nenhuma vacina encontrada..."
+						}
+						rightSection={searchingVaccines ? <Loader size="xs" /> : undefined}
 						clearable
 						allowDeselect
 						{...form.getInputProps("vaccine_id")}
@@ -146,7 +169,6 @@ export function VaccinationFormFields({
 
 			<Grid>
 				<Grid.Col span={{ base: 12, sm: 6 }}>
-					{" "}
 					<DatePickerInput
 						label="Data da Dose"
 						placeholder="Selecione a data da vacinação"

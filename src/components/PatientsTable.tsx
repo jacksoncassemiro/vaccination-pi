@@ -184,7 +184,6 @@ export function PatientsTable({
 														size="sm"
 														onClick={() => onExportPdf(patient)}
 													>
-														{" "}
 														<FaFileDownload
 															style={{ width: rem(16), height: rem(16) }}
 														/>

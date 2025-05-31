@@ -29,7 +29,7 @@ export default function AuthPage() {
 						</Title>
 						<Text ta="center" c="dimmed" size="sm">
 							Use sua conta do Google para acessar o sistema
-						</Text>{" "}
+						</Text>
 						<form action={signInWithGoogle}>
 							<Button
 								fullWidth

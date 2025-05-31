@@ -140,7 +140,7 @@ export function UserMenu({ className }: UserMenuProps) {
 						{getThemeLabel("auto")}
 					</Menu.Item>
 					<Menu.Divider />
-					<Menu.Label>Conta</Menu.Label>{" "}
+					<Menu.Label>Conta</Menu.Label>
 					<Menu.Item
 						leftSection={<FaSignOutAlt size={14} />}
 						color="red"
