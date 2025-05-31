@@ -2623,10 +2623,10 @@ magic-string@^0.30.17:
   dependencies:
     "@jridgewell/sourcemap-codec" "^1.5.0"
 
-mantine-form-zod-resolver@^1.1.0:
-  version "1.1.0"
-  resolved "https://registry.yarnpkg.com/mantine-form-zod-resolver/-/mantine-form-zod-resolver-1.1.0.tgz#9c73aa6cd84fc838f10d728859aecd4c0a432e55"
-  integrity sha512-hidTuYq6agSF5XbkcVVcr0mkGs9ki/x8OC9ldZMxGLVGja6bdl+x4k1hCNrigCG90DBoMDnu0bo3hprGBBlUZA==
+mantine-form-zod-resolver@^1.2.1:
+  version "1.2.1"
+  resolved "https://registry.yarnpkg.com/mantine-form-zod-resolver/-/mantine-form-zod-resolver-1.2.1.tgz#b0c49b5c8d9d3c2310896956f70ee3ed48cd4811"
+  integrity sha512-8Y7jX3ybZEhQeLzkbrzCS9gulnCX7sgjM5bCkRDxQHbmal8V5lLM9yZq583UEme8DuM77x/BJNTrBkYZo+JUFw==
 
 math-intrinsics@^1.1.0:
   version "1.1.0"
