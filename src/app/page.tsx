@@ -20,19 +20,16 @@ export default function HomePage() {
 						<Title order={2} ta="center">
 							Bem-vindo!
 						</Title>
-
 						{user && (
 							<Text ta="center" c="dimmed">
 								Olá, {user.user_metadata?.full_name || user.email}!
 							</Text>
 						)}
-
 						<Text ta="center">
 							Sistema de gestão de vacinação para o curso de Sistemas para
 							Internet da UNCISAL.
 						</Text>
-
-						{/* Demonstração do sistema de temas */}
+						=
 						<Group justify="center" gap="xs">
 							<Badge variant="light" color={isDark ? "yellow" : "blue"}>
 								Tema: {colorScheme}

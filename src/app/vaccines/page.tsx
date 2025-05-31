@@ -93,7 +93,6 @@ export default function VaccinesPage() {
 	return (
 		<AppLayout>
 			<Stack gap="lg" py="md">
-				{/* Header */}
 				<Paper p="md" withBorder>
 					<Group justify="space-between" align="center">
 						<div>
@@ -121,7 +120,6 @@ export default function VaccinesPage() {
 					</Group>
 				</Paper>
 
-				{/* Filtros */}
 				<Paper p="md" withBorder>
 					<Group align="end">
 						<TextInput
@@ -134,7 +132,6 @@ export default function VaccinesPage() {
 					</Group>
 				</Paper>
 
-				{/* Estatísticas */}
 				<Paper p="md" withBorder>
 					<Group gap="xl">
 						<div>
@@ -165,8 +162,6 @@ export default function VaccinesPage() {
 						)}
 					</Group>
 				</Paper>
-
-				{/* Erro */}
 				{error && (
 					<Paper p="md" withBorder bg="red.0">
 						<Text c="red" size="sm">
@@ -175,7 +170,6 @@ export default function VaccinesPage() {
 					</Paper>
 				)}
 
-				{/* Tabela */}
 				<VaccinesTable
 					vaccines={vaccines.data}
 					loading={isPending}

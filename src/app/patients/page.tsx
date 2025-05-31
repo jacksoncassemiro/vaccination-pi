@@ -90,7 +90,6 @@ export default function PatientsPage() {
 	return (
 		<AppLayout>
 			<Stack gap="lg" py="md">
-				{/* Header */}
 				<Paper p="md" withBorder>
 					<Group justify="space-between" align="center">
 						<div>
@@ -117,7 +116,7 @@ export default function PatientsPage() {
 						</Group>
 					</Group>
 				</Paper>
-				{/* Filtros */}
+
 				<Paper p="md" withBorder>
 					<Group align="end">
 						<TextInput
