@@ -1,6 +1,6 @@
 "use client";
 
-import { signOut } from "@/app/auth/actions";
+import { signOut } from "@/app/(public)/auth/actions";
 import { useAuth } from "@/contexts";
 import {
 	Avatar,
