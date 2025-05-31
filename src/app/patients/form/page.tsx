@@ -216,7 +216,7 @@ export default function PatientFormPage() {
 					>
 						Voltar
 					</Button>
-				</Group>{" "}
+				</Group>
 				<form onSubmit={form.onSubmit(handleSubmit)}>
 					<Stack gap="md">
 						<PatientFormFields

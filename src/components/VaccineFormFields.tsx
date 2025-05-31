@@ -12,7 +12,6 @@ interface VaccineFormFieldsProps {
 export function VaccineFormFields({ form, disabled }: VaccineFormFieldsProps) {
 	return (
 		<Stack gap="md">
-			{/* Informações da Vacina */}{" "}
 			<Grid>
 				<Grid.Col span={{ base: 12, sm: 6 }}>
 					<TextInput

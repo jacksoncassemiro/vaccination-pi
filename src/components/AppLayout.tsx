@@ -155,7 +155,7 @@ export function AppLayout({ children, showUserMenu = true }: AppLayoutProps) {
 						</Text>
 					</AppShell.Section>
 				</AppShell.Navbar>
-			)}{" "}
+			)}
 			<AppShell.Main>
 				<Container size="md">
 					<Stack gap="md">
