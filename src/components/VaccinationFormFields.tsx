@@ -16,7 +16,7 @@ import {
 import { DatePickerInput } from "@mantine/dates";
 import { type UseFormReturnType } from "@mantine/form";
 import { useDebouncedCallback } from "@mantine/hooks";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 interface VaccinationFormFieldsProps {
 	form: UseFormReturnType<VaccinationFormData>;
@@ -42,10 +42,13 @@ export function VaccinationFormFields({
 	const [patients, setPatients] = useState<Patient[]>([]);
 	const [vaccines, setVaccines] = useState<Vaccine[]>([]);
 	const [loading, setLoading] = useState(true);
-
 	// Estados de busca para cada select
 	const [patientSearchTerm, setPatientSearchTerm] = useState("");
 	const [vaccineSearchTerm, setVaccineSearchTerm] = useState("");
+
+	// Refs para armazenar valores anteriores dos termos de busca
+	const prevPatientSearchTerm = useRef("");
+	const prevVaccineSearchTerm = useRef("");
 
 	// Estados de loading para feedback visual
 	const [searchingPatients, setSearchingPatients] = useState(false);
@@ -108,29 +111,36 @@ export function VaccinationFormFields({
 		};
 
 		fetchInitialData();
-	}, []);
-	// Handlers para mudanças de busca
+	}, []); // Handlers para mudanças de busca
 	const handlePatientSearchChange = (searchTerm: string) => {
 		setPatientSearchTerm(searchTerm);
 
-		// Se o campo foi limpo, restaura os dados iniciais
+		// Se o campo foi limpo, restaura os dados iniciais apenas se o valor anterior não estava vazio
 		if (!searchTerm.trim()) {
-			getUserPatients("", 10).then(setPatients);
+			if (prevPatientSearchTerm.current.trim()) {
+				getUserPatients("", 10).then(setPatients);
+			}
+			prevPatientSearchTerm.current = searchTerm;
 			return;
 		}
 
+		prevPatientSearchTerm.current = searchTerm;
 		debouncedPatientSearch(searchTerm);
 	};
 
 	const handleVaccineSearchChange = (searchTerm: string) => {
 		setVaccineSearchTerm(searchTerm);
 
-		// Se o campo foi limpo, restaura os dados iniciais
+		// Se o campo foi limpo, restaura os dados iniciais apenas se o valor anterior não estava vazio
 		if (!searchTerm.trim()) {
-			getUserVaccines("", 10).then(setVaccines);
+			if (prevVaccineSearchTerm.current.trim()) {
+				getUserVaccines("", 10).then(setVaccines);
+			}
+			prevVaccineSearchTerm.current = searchTerm;
 			return;
 		}
 
+		prevVaccineSearchTerm.current = searchTerm;
 		debouncedVaccineSearch(searchTerm);
 	};
 
