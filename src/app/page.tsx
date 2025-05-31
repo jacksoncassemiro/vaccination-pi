@@ -29,7 +29,6 @@ export default function HomePage() {
 							Sistema de gestão de vacinação para o curso de Sistemas para
 							Internet da UNCISAL.
 						</Text>
-						=
 						<Group justify="center" gap="xs">
 							<Badge variant="light" color={isDark ? "yellow" : "blue"}>
 								Tema: {colorScheme}
