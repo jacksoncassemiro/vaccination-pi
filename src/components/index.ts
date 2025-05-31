@@ -1,4 +1,5 @@
-export * from "./AppLayout";
+export * from "./AppAuthLayout";
+export * from "./AppPublicLayout";
 export * from "./ConnectionStatus";
 export * from "./LoadingScreen";
 export * from "./Logo";

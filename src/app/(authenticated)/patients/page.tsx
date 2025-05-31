@@ -1,6 +1,5 @@
 "use client";
 
-import { AppLayout } from "@/components/AppLayout";
 import { PatientsTable } from "@/components/PatientsTable";
 import { usePdfExport } from "@/hooks";
 import type { Patient, PatientsResponse } from "@/types/patients";
@@ -88,94 +87,89 @@ export default function PatientsPage() {
 	};
 
 	return (
-		<AppLayout>
-			<Stack gap="lg" py="md">
-				<Paper p="md" withBorder>
-					<Group justify="space-between" align="center">
-						<div>
-							<Title order={2}>Pacientes</Title>
-							<Text c="dimmed" size="sm">
-								Gerencie o cadastro de pacientes do sistema
-							</Text>
-						</div>
-						<Group>
-							<Button
-								variant="outline"
-								leftSection={<FileDown size={16} />}
-								onClick={handleExportToPdf}
-								disabled={patients.data.length === 0}
-							>
-								Exportar PDF
-							</Button>
-							<Button
-								leftSection={<Plus size={16} />}
-								onClick={handleAddPatient}
-							>
-								Novo Paciente
-							</Button>
-						</Group>
+		<Stack gap="lg" py="md">
+			<Paper p="md" withBorder>
+				<Group justify="space-between" align="center">
+					<div>
+						<Title order={2}>Pacientes</Title>
+						<Text c="dimmed" size="sm">
+							Gerencie o cadastro de pacientes do sistema
+						</Text>
+					</div>
+					<Group>
+						<Button
+							variant="outline"
+							leftSection={<FileDown size={16} />}
+							onClick={handleExportToPdf}
+							disabled={patients.data.length === 0}
+						>
+							Exportar PDF
+						</Button>
+						<Button leftSection={<Plus size={16} />} onClick={handleAddPatient}>
+							Novo Paciente
+						</Button>
 					</Group>
-				</Paper>
+				</Group>
+			</Paper>
 
-				<Paper p="md" withBorder>
-					<Group align="end">
-						<TextInput
-							placeholder="Buscar por nome, CPF ou telefone..."
-							leftSection={<Search size={16} />}
-							value={search}
-							onChange={(event) => setSearch(event.currentTarget.value)}
-							style={{ flex: 1 }}
-						/>
-					</Group>
-				</Paper>
-				<Paper p="md" withBorder>
-					<Group gap="xl">
+			<Paper p="md" withBorder>
+				<Group align="end">
+					<TextInput
+						placeholder="Buscar por nome, CPF ou telefone..."
+						leftSection={<Search size={16} />}
+						value={search}
+						onChange={(event) => setSearch(event.currentTarget.value)}
+						style={{ flex: 1 }}
+					/>
+				</Group>
+			</Paper>
+			<Paper p="md" withBorder>
+				<Group gap="xl">
+					<div>
+						<Text size="xl" fw={700} c="blue">
+							{patients.count}
+						</Text>
+						<Text size="sm" c="dimmed">
+							Total de Pacientes
+						</Text>
+					</div>
+					<div>
+						<Text size="xl" fw={700} c="green">
+							{patients.data.length}
+						</Text>
+						<Text size="sm" c="dimmed">
+							Nesta Página
+						</Text>
+					</div>
+					{search && (
 						<div>
-							<Text size="xl" fw={700} c="blue">
+							<Text size="xl" fw={700} c="orange">
 								{patients.count}
 							</Text>
 							<Text size="sm" c="dimmed">
-								Total de Pacientes
+								Resultados da Busca
 							</Text>
 						</div>
-						<div>
-							<Text size="xl" fw={700} c="green">
-								{patients.data.length}
-							</Text>
-							<Text size="sm" c="dimmed">
-								Nesta Página
-							</Text>
-						</div>
-						{search && (
-							<div>
-								<Text size="xl" fw={700} c="orange">
-									{patients.count}
-								</Text>
-								<Text size="sm" c="dimmed">
-									Resultados da Busca
-								</Text>
-							</div>
-						)}
-					</Group>
+					)}
+				</Group>
+			</Paper>
+			{error && (
+				<Paper p="md" withBorder bg="red.0">
+					<Text c="red" size="sm">
+						{error}
+					</Text>
 				</Paper>
-				{error && (
-					<Paper p="md" withBorder bg="red.0">
-						<Text c="red" size="sm">
-							{error}
-						</Text>
-					</Paper>
-				)}
-				<PatientsTable
-					patients={patients.data}
-					loading={isPending}
-					page={currentPage}
-					totalPages={patients.totalPages}
-					onPageChange={setCurrentPage}
-					onEdit={handleEditPatient}
-					onDelete={handleDeletePatient}
-					onExportPdf={handleExportPatientToPdf}
-				/>
-			</Stack>
-		</AppLayout>
+			)}
+			<PatientsTable
+				patients={patients.data}
+				loading={isPending}
+				page={currentPage}
+				totalPages={patients.totalPages}
+				onPageChange={setCurrentPage}
+				onEdit={handleEditPatient}
+				onDelete={handleDeletePatient}
+				onExportPdf={handleExportPatientToPdf}
+			/>
+		</Stack>
 	);
 }

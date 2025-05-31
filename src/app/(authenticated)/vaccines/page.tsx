@@ -1,6 +1,5 @@
 "use client";
 
-import { AppLayout } from "@/components/AppLayout";
 import { VaccinesTable } from "@/components/VaccinesTable";
 import { usePdfExport } from "@/hooks";
 import type { Vaccine, VaccinesResponse } from "@/types/vaccines";
@@ -91,96 +90,91 @@ export default function VaccinesPage() {
 	};
 
 	return (
-		<AppLayout>
-			<Stack gap="lg" py="md">
-				<Paper p="md" withBorder>
-					<Group justify="space-between" align="center">
-						<div>
-							<Title order={2}>Vacinas</Title>
-							<Text c="dimmed" size="sm">
-								Gerencie o catálogo de vacinas disponíveis no sistema
-							</Text>
-						</div>
-						<Group>
-							<Button
-								variant="outline"
-								leftSection={<FileDown size={16} />}
-								onClick={handleExportToPdf}
-								disabled={vaccines.data.length === 0}
-							>
-								Exportar PDF
-							</Button>
-							<Button
-								leftSection={<Plus size={16} />}
-								onClick={handleAddVaccine}
-							>
-								Nova Vacina
-							</Button>
-						</Group>
+		<Stack gap="lg" py="md">
+			<Paper p="md" withBorder>
+				<Group justify="space-between" align="center">
+					<div>
+						<Title order={2}>Vacinas</Title>
+						<Text c="dimmed" size="sm">
+							Gerencie o catálogo de vacinas disponíveis no sistema
+						</Text>
+					</div>
+					<Group>
+						<Button
+							variant="outline"
+							leftSection={<FileDown size={16} />}
+							onClick={handleExportToPdf}
+							disabled={vaccines.data.length === 0}
+						>
+							Exportar PDF
+						</Button>
+						<Button leftSection={<Plus size={16} />} onClick={handleAddVaccine}>
+							Nova Vacina
+						</Button>
 					</Group>
-				</Paper>
+				</Group>
+			</Paper>
 
-				<Paper p="md" withBorder>
-					<Group align="end">
-						<TextInput
-							placeholder="Buscar por tipo ou fabricante..."
-							leftSection={<Search size={16} />}
-							value={search}
-							onChange={(event) => setSearch(event.currentTarget.value)}
-							style={{ flex: 1 }}
-						/>
-					</Group>
-				</Paper>
+			<Paper p="md" withBorder>
+				<Group align="end">
+					<TextInput
+						placeholder="Buscar por tipo ou fabricante..."
+						leftSection={<Search size={16} />}
+						value={search}
+						onChange={(event) => setSearch(event.currentTarget.value)}
+						style={{ flex: 1 }}
+					/>
+				</Group>
+			</Paper>
 
-				<Paper p="md" withBorder>
-					<Group gap="xl">
+			<Paper p="md" withBorder>
+				<Group gap="xl">
+					<div>
+						<Text size="xl" fw={700} c="blue">
+							{vaccines.count}
+						</Text>
+						<Text size="sm" c="dimmed">
+							Total de Vacinas
+						</Text>
+					</div>
+					<div>
+						<Text size="xl" fw={700} c="green">
+							{vaccines.data.length}
+						</Text>
+						<Text size="sm" c="dimmed">
+							Nesta Página
+						</Text>
+					</div>
+					{search && (
 						<div>
-							<Text size="xl" fw={700} c="blue">
+							<Text size="xl" fw={700} c="orange">
 								{vaccines.count}
 							</Text>
 							<Text size="sm" c="dimmed">
-								Total de Vacinas
+								Resultados da Busca
 							</Text>
 						</div>
-						<div>
-							<Text size="xl" fw={700} c="green">
-								{vaccines.data.length}
-							</Text>
-							<Text size="sm" c="dimmed">
-								Nesta Página
-							</Text>
-						</div>
-						{search && (
-							<div>
-								<Text size="xl" fw={700} c="orange">
-									{vaccines.count}
-								</Text>
-								<Text size="sm" c="dimmed">
-									Resultados da Busca
-								</Text>
-							</div>
-						)}
-					</Group>
+					)}
+				</Group>
+			</Paper>
+			{error && (
+				<Paper p="md" withBorder bg="red.0">
+					<Text c="red" size="sm">
+						{error}
+					</Text>
 				</Paper>
-				{error && (
-					<Paper p="md" withBorder bg="red.0">
-						<Text c="red" size="sm">
-							{error}
-						</Text>
-					</Paper>
-				)}
+			)}
 
-				<VaccinesTable
-					vaccines={vaccines.data}
-					loading={isPending}
-					page={currentPage}
-					totalPages={vaccines.totalPages}
-					onPageChange={setCurrentPage}
-					onEdit={handleEditVaccine}
-					onDelete={handleDeleteVaccine}
-					onExportPdf={handleExportVaccineToPdf}
-				/>
-			</Stack>
-		</AppLayout>
+			<VaccinesTable
+				vaccines={vaccines.data}
+				loading={isPending}
+				page={currentPage}
+				totalPages={vaccines.totalPages}
+				onPageChange={setCurrentPage}
+				onEdit={handleEditVaccine}
+				onDelete={handleDeleteVaccine}
+				onExportPdf={handleExportVaccineToPdf}
+			/>
+		</Stack>
 	);
 }

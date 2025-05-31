@@ -1,6 +1,6 @@
 "use client";
 
-import { AppLayout, LoadingScreen } from "@/components";
+import { LoadingScreen } from "@/components";
 import { useAuth } from "@/contexts";
 import { Button, Center, Paper, Stack, Text, Title } from "@mantine/core";
 import { Chrome } from "lucide-react";
@@ -13,43 +13,41 @@ export default function AuthPage() {
 		return <LoadingScreen />;
 	}
 	return (
-		<AppLayout showUserMenu={false}>
-			<Center h="70vh" py="xl">
-				<Paper p="xl" radius="md" withBorder w="100%" maw={400}>
-					<Stack gap="lg">
-						<Stack gap="sm" ta="center">
-							<Title order={1}>Entrar no Sistema</Title>
-							<Text c="dimmed" size="sm">
-								Sistema de gestão de vacinação
-							</Text>
-						</Stack>
-
-						<Stack gap="md">
-							<Title order={2} ta="center" size="h3">
-								Autenticação
-							</Title>
-							<Text ta="center" c="dimmed" size="sm">
-								Use sua conta do Google para acessar o sistema
-							</Text>
-							<form action={signInWithGoogle}>
-								<Button
-									fullWidth
-									leftSection={<Chrome size={18} />}
-									variant="default"
-									type="submit"
-									size="md"
-								>
-									Continuar com Google
-								</Button>
-							</form>
-						</Stack>
-
-						<Text ta="center" c="dimmed" size="xs">
-							Ao continuar, você concorda com os termos de uso do sistema.
+		<Center h="70vh" py="xl">
+			<Paper p="xl" radius="md" withBorder w="100%" maw={400}>
+				<Stack gap="lg">
+					<Stack gap="sm" ta="center">
+						<Title order={1}>Entrar no Sistema</Title>
+						<Text c="dimmed" size="sm">
+							Sistema de gestão de vacinação
 						</Text>
 					</Stack>
-				</Paper>
-			</Center>
-		</AppLayout>
+
+					<Stack gap="md">
+						<Title order={2} ta="center" size="h3">
+							Autenticação
+						</Title>
+						<Text ta="center" c="dimmed" size="sm">
+							Use sua conta do Google para acessar o sistema
+						</Text>
+						<form action={signInWithGoogle}>
+							<Button
+								fullWidth
+								leftSection={<Chrome size={18} />}
+								variant="default"
+								type="submit"
+								size="md"
+							>
+								Continuar com Google
+							</Button>
+						</form>
+					</Stack>
+
+					<Text ta="center" c="dimmed" size="xs">
+						Ao continuar, você concorda com os termos de uso do sistema.
+					</Text>
+				</Stack>
+			</Paper>
+		</Center>
 	);
 }

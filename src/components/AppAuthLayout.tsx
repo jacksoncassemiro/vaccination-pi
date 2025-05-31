@@ -19,12 +19,15 @@ import { ConnectionStatus } from "./ConnectionStatus";
 import { Logo } from "./Logo";
 import { UserMenu } from "./UserMenu";
 
-interface AppLayoutProps {
+interface AppAuthLayoutProps {
 	children: ReactNode;
 	showUserMenu?: boolean;
 }
 
-export function AppLayout({ children, showUserMenu = true }: AppLayoutProps) {
+export function AppAuthLayout({
+	children,
+	showUserMenu = true,
+}: AppAuthLayoutProps) {
 	const { user } = useAuth();
 	const router = useRouter();
 	const pathname = usePathname();

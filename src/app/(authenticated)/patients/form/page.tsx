@@ -1,6 +1,6 @@
 "use client";
 
-import { AppLayout } from "@/components/AppLayout";
+import { AppLayout } from "@/components/AppAuthLayout";
 import { PatientFormFields } from "@/components/PatientFormFields";
 import { fetchAddressByCep } from "@/lib/viaCep";
 import { patientSchema, type PatientFormData } from "@/schemas/patientSchema";

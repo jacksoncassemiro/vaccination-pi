@@ -1,6 +1,6 @@
 "use client";
 
-import { AppLayout } from "@/components/AppLayout";
+import { AppLayout } from "@/components/AppAuthLayout";
 import { VaccineFormFields } from "@/components/VaccineFormFields";
 import { vaccineSchema, type VaccineFormData } from "@/schemas/vaccineSchema";
 import { Button, Group, Stack, Title } from "@mantine/core";
