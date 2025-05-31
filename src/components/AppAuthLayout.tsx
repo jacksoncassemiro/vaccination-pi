@@ -31,40 +31,34 @@ export function AppAuthLayout({
 			header={
 				<AppHeader
 					leftContent={
-						user && (
-							<Burger
-								opened={mobileOpened}
-								onClick={toggleMobile}
-								hiddenFrom="sm"
-								size="sm"
-							/>
-						)
+						<Burger
+							opened={mobileOpened}
+							onClick={toggleMobile}
+							hiddenFrom="sm"
+							size="sm"
+						/>
 					}
 					rightContent={
-						user && (
-							<Group gap={8}>
-								<Group gap={8} visibleFrom="sm">
-									<AuthDesktopNav />
-								</Group>
-								{showUserMenu && <UserMenu />}
+						<Group gap={8}>
+							<Group gap={8} visibleFrom="sm">
+								<AuthDesktopNav />
 							</Group>
-						)
+							{showUserMenu && <UserMenu />}
+						</Group>
 					}
 				/>
 			}
 			navbar={
-				user ? (
-					<div
-						style={{
-							padding: "16px",
-							height: "100%",
-							display: "flex",
-							flexDirection: "column",
-						}}
-					>
-						<AuthNavbar />
-					</div>
-				) : undefined
+				<div
+					style={{
+						padding: "16px",
+						height: "100%",
+						display: "flex",
+						flexDirection: "column",
+					}}
+				>
+					<AuthNavbar />
+				</div>
 			}
 		>
 			{children}
