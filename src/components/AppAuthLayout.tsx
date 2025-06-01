@@ -24,10 +24,10 @@ export function AppAuthLayout({
 }: AppAuthLayoutProps) {
 	const { user } = useAuth();
 	const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
-
 	return (
 		<BaseAppShell
 			withNavbar={!!user}
+			mobileOpened={mobileOpened}
 			header={
 				<AppHeader
 					leftContent={

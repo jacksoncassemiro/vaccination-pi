@@ -9,6 +9,7 @@ interface BaseAppShellProps {
 	header: ReactNode;
 	navbar?: ReactNode;
 	withNavbar?: boolean;
+	mobileOpened?: boolean;
 }
 
 /**
@@ -20,16 +21,16 @@ export function BaseAppShell({
 	header,
 	navbar,
 	withNavbar = false,
+	mobileOpened = false,
 }: BaseAppShellProps) {
-	return (
-		<AppShell
+	return (		<AppShell
 			header={{ height: 60 }}
 			navbar={
 				withNavbar && navbar
 					? {
 							width: 300,
 							breakpoint: "sm",
-							collapsed: { desktop: true, mobile: true },
+							collapsed: { mobile: !mobileOpened },
 					  }
 					: undefined
 			}
