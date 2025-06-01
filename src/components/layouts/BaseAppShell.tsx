@@ -38,10 +38,8 @@ export function BaseAppShell({
 			padding={{ base: "xs", sm: "md" }}
 		>
 			<AppShell.Header>{header}</AppShell.Header>
-
 			{withNavbar && navbar && <AppShell.Navbar>{navbar}</AppShell.Navbar>}
-
-			<AppShell.Main>
+			<AppShell.Main bg="var(--mantine-color-disabled)">
 				<Container size="md">
 					<Stack gap="md">
 						<ConnectionStatus />
