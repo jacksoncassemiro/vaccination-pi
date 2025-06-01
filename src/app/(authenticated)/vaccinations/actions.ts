@@ -8,6 +8,9 @@ import type {
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
+// Tipo genérico para linhas do banco de dados
+type DatabaseRow = Record<string, unknown>;
+
 // Tipo específico para as actions que recebem FormData (dose_date como string)
 type VaccinationActionData = Omit<VaccinationFormData, "dose_date"> & {
 	dose_date: string;
@@ -373,4 +376,207 @@ export async function getUserVaccines(search: string = "", limit: number = 50) {
 	}
 
 	return data || [];
+}
+
+// Funções para Dashboard
+export async function getDashboardStats() {
+	const supabase = await createClient();
+
+	// Verificar autenticação
+	const {
+		data: { user },
+		error: authError,
+	} = await supabase.auth.getUser();
+
+	if (authError || !user) {
+		throw new Error("Usuário não autenticado");
+	}
+
+	// Buscar total de pacientes
+	const { count: totalPatients } = await supabase
+		.from("patients")
+		.select("*", { count: "exact", head: true })
+		.eq("user_id", user.id);
+
+	// Buscar total de vacinas
+	const { count: totalVaccines } = await supabase
+		.from("vaccine_catalog")
+		.select("*", { count: "exact", head: true })
+		.eq("user_id", user.id);
+
+	// Buscar total de vacinações
+	const { count: totalVaccinations } = await supabase
+		.from("vaccination_records")
+		.select(
+			`
+			*,
+			patient:patients!inner(user_id)
+		`,
+			{ count: "exact", head: true }
+		)
+		.eq("patient.user_id", user.id);
+
+	return {
+		totalPatients: totalPatients || 0,
+		totalVaccines: totalVaccines || 0,
+		totalVaccinations: totalVaccinations || 0,
+	};
+}
+
+export async function getVaccinationsByVaccineType() {
+	const supabase = await createClient();
+
+	// Verificar autenticação
+	const {
+		data: { user },
+		error: authError,
+	} = await supabase.auth.getUser();
+
+	if (authError || !user) {
+		throw new Error("Usuário não autenticado");
+	}
+	const { data, error } = await supabase
+		.from("vaccination_records")
+		.select(`
+			vaccine_catalog!inner(type, manufacturer),
+			patients!inner(user_id)
+		`)
+		.eq("patients.user_id", user.id);
+
+	if (error) {
+		throw new Error(`Erro ao buscar vacinações por tipo: ${error.message}`);
+	}	// Agrupar por tipo de vacina
+	const grouped = (data || []).reduce((acc, record: DatabaseRow) => {
+		const vaccine = record.vaccine_catalog as { type?: string; manufacturer?: string };
+		if (vaccine && vaccine.type && vaccine.manufacturer) {
+			const vaccineType = vaccine.type;
+			const key = `${vaccineType} - ${vaccine.manufacturer}`;
+			acc[key] = (acc[key] || 0) + 1;
+		}
+		return acc;
+	}, {} as Record<string, number>);
+	// Converter para formato do gráfico com cores
+	const colors = [
+		"blue.6",
+		"green.6",
+		"yellow.6",
+		"red.6",
+		"violet.6",
+		"orange.6",
+		"teal.6",
+		"pink.6",
+		"indigo.6",
+		"cyan.6",
+	];
+
+	return Object.entries(grouped).map(([name, value], index) => ({
+		name,
+		value,
+		color: colors[index % colors.length],
+	}));
+}
+
+export async function getVaccinationsByMonth() {
+	const supabase = await createClient();
+
+	// Verificar autenticação
+	const {
+		data: { user },
+		error: authError,
+	} = await supabase.auth.getUser();
+
+	if (authError || !user) {
+		throw new Error("Usuário não autenticado");
+	}
+
+	// Buscar vacinações dos últimos 12 meses
+	const oneYearAgo = new Date();
+	oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
+	const { data, error } = await supabase
+		.from("vaccination_records")
+		.select(`
+			dose_date,
+			patients!inner(user_id)
+		`)
+		.eq("patients.user_id", user.id)
+		.gte("dose_date", oneYearAgo.toISOString().split("T")[0])
+		.order("dose_date");
+
+	if (error) {
+		throw new Error(`Erro ao buscar vacinações por mês: ${error.message}`);
+	}	// Agrupar por mês
+	const grouped = (data || []).reduce((acc, record: DatabaseRow) => {
+		const date = new Date(record.dose_date as string);
+		const monthKey = `${date.getFullYear()}-${String(
+			date.getMonth() + 1
+		).padStart(2, "0")}`;
+		const monthName = date.toLocaleDateString("pt-BR", {
+			month: "long",
+			year: "numeric",
+		});
+		acc[monthKey] = {
+			month: monthName,
+			count: (acc[monthKey]?.count || 0) + 1,
+		};
+		return acc;
+	}, {} as Record<string, { month: string; count: number }>);
+
+	// Converter para formato do gráfico e ordenar
+	return Object.values(grouped)
+		.sort((a, b) => a.month.localeCompare(b.month))
+		.map(({ month, count }) => ({
+			month,
+			vacinações: count,
+		}));
+}
+
+export async function getPatientsByAgeGroup() {
+	const supabase = await createClient();
+
+	// Verificar autenticação
+	const {
+		data: { user },
+		error: authError,
+	} = await supabase.auth.getUser();
+
+	if (authError || !user) {
+		throw new Error("Usuário não autenticado");
+	}
+
+	const { data, error } = await supabase
+		.from("patients")
+		.select("birth_date")
+		.eq("user_id", user.id);
+
+	if (error) {
+		throw new Error(
+			`Erro ao buscar pacientes por faixa etária: ${error.message}`
+		);
+	}	// Calcular idades e agrupar
+	const currentYear = new Date().getFullYear();
+	const ageGroups = {
+		"0-17": 0,
+		"18-29": 0,
+		"30-39": 0,
+		"40-49": 0,
+		"50-59": 0,
+		"60+": 0,
+	};
+	(data || []).forEach((patient: DatabaseRow) => {
+		const birthYear = new Date(patient.birth_date as string).getFullYear();
+		const age = currentYear - birthYear;
+
+		if (age <= 17) ageGroups["0-17"]++;
+		else if (age <= 29) ageGroups["18-29"]++;
+		else if (age <= 39) ageGroups["30-39"]++;
+		else if (age <= 49) ageGroups["40-49"]++;
+		else if (age <= 59) ageGroups["50-59"]++;
+		else ageGroups["60+"]++;
+	});
+
+	// Converter para formato do gráfico
+	return Object.entries(ageGroups).map(([group, count]) => ({
+		group,
+		pacientes: count,
+	}));
 }

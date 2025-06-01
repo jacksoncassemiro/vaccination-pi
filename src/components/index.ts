@@ -1,5 +1,6 @@
 export * from "./AppAuthLayout";
 export * from "./AppPublicLayout";
+export * from "./charts";
 export * from "./common/CrudPageLayout";
 export * from "./common/SearchableSelect";
 export * from "./ConnectionStatus";
