@@ -152,10 +152,10 @@ export function DashboardFilters({
 	return (
 		<Paper p="md" withBorder>
 			<Stack gap="md">
-				<Group justify="space-between" align="center">
+				<Group justify="flex-start" gap="xs" align="center">
+					<FaFilter />
 					<Text fw={500} size="lg">
-						<FaFilter style={{ marginRight: "8px" }} />
-						Filtros do Dashboard
+						Filtros
 					</Text>
 				</Group>
 
