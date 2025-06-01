@@ -26,6 +26,12 @@ export async function GET(request: Request) {
 
 				return NextResponse.redirect(`${redirectUrl}${next}`);
 			} else if (forwardedHost) {
+				console.log(
+					"Redirecionando para o host original:",
+					forwardedHost,
+					"next:",
+					next
+				);
 				return NextResponse.redirect(`https://${forwardedHost}${next}`);
 			} else {
 				return NextResponse.redirect(`${origin}${next}`);
