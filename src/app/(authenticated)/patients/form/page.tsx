@@ -1,7 +1,9 @@
 "use client";
 
+import { PatientFormFields } from "@/components";
 import { fetchAddressByCep } from "@/lib/viaCep";
 import { patientSchema, type PatientFormData } from "@/schemas/patientSchema";
+import { formatDateForForm, parseDateFromString } from "@/utils/formatters";
 import { Button, Group, Stack, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { useDebouncedCallback } from "@mantine/hooks";
@@ -11,7 +13,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { createPatient, getPatientById, updatePatient } from "../actions";
-import { PatientFormFields } from "@/components";
 
 export default function PatientFormPage() {
 	const router = useRouter();
@@ -44,13 +45,14 @@ export default function PatientFormPage() {
 					const patientToEdit = await getPatientById(patientId);
 					let birthDateForForm: Date = new Date();
 					if (patientToEdit.birth_date) {
-						const parsedDate = new Date(patientToEdit.birth_date);
-						if (!Number.isNaN(parsedDate.getTime())) {
-							birthDateForForm = parsedDate;
-						} else {
+						try {
+							birthDateForForm = parseDateFromString(patientToEdit.birth_date);
+						} catch (error) {
 							console.warn(
-								`Data de nascimento inválida recebida: ${patientToEdit.birth_date}`
+								`Data de nascimento inválida recebida: ${patientToEdit.birth_date}`,
+								error
 							);
+							// Manter a data padrão se não conseguir fazer o parse
 						}
 					}
 					form.setValues({
@@ -140,7 +142,7 @@ export default function PatientFormPage() {
 				const formDataToSubmit = new globalThis.FormData();
 				Object.entries(values).forEach(([key, value]) => {
 					if (value instanceof Date) {
-						formDataToSubmit.append(key, value.toISOString().split("T")[0]);
+						formDataToSubmit.append(key, formatDateForForm(value));
 					} else if (value !== null && value !== undefined) {
 						formDataToSubmit.append(key, String(value));
 					}

@@ -5,6 +5,7 @@ import {
 	vaccinationSchema,
 	type VaccinationFormData,
 } from "@/schemas/vaccinationSchema";
+import { formatDateForForm, parseDateFromString } from "@/utils/formatters";
 import { Button, Group, Stack, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
 import { notifications } from "@mantine/notifications";
@@ -41,12 +42,26 @@ export default function VaccinationFormPage() {
 			const fetchData = async () => {
 				try {
 					const vaccinationToEdit = await getVaccinationById(vaccinationId);
+
+					let doseDateForForm: Date = new Date();
+					if (vaccinationToEdit.dose_date) {
+						try {
+							doseDateForForm = parseDateFromString(
+								vaccinationToEdit.dose_date
+							);
+						} catch (error) {
+							console.warn(
+								`Data da dose inválida recebida: ${vaccinationToEdit.dose_date}`,
+								error
+							);
+							// Manter a data padrão se não conseguir fazer o parse
+						}
+					}
+
 					form.setValues({
 						patient_id: vaccinationToEdit.patient_id || "",
 						vaccine_id: vaccinationToEdit.vaccine_id || "",
-						dose_date: vaccinationToEdit.dose_date
-							? new Date(vaccinationToEdit.dose_date)
-							: new Date(),
+						dose_date: doseDateForForm,
 						batch_number: vaccinationToEdit.batch_number || "",
 						location: vaccinationToEdit.location || "",
 						notes: vaccinationToEdit.notes || "",
@@ -76,15 +91,13 @@ export default function VaccinationFormPage() {
 			try {
 				const formData = new FormData();
 				formData.append("patient_id", values.patient_id);
-				formData.append("vaccine_id", values.vaccine_id);
-
-				// Garantir que dose_date seja um objeto Date válido
+				formData.append("vaccine_id", values.vaccine_id); // Garantir que dose_date seja um objeto Date válido
 				const doseDate =
 					values.dose_date instanceof Date
 						? values.dose_date
 						: new Date(values.dose_date);
 
-				formData.append("dose_date", doseDate.toISOString().split("T")[0]);
+				formData.append("dose_date", formatDateForForm(doseDate));
 				formData.append("batch_number", values.batch_number);
 				formData.append("location", values.location);
 				if (values.notes) {

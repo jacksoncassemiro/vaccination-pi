@@ -1,3 +1,5 @@
+import dayjs from "dayjs";
+
 export function formatCpf(value: string): string {
 	const cleanValue = value.replace(/\D/g, "");
 	return cleanValue
@@ -25,4 +27,28 @@ export function formatPhone(value: string): string {
 export function formatCep(value: string): string {
 	const cleanValue = value.replace(/\D/g, "");
 	return cleanValue.replace(/(\d{5})(\d)/, "$1-$2");
+}
+
+/**
+ * Converte uma data para string no formato YYYY-MM-DD preservando o fuso horário local
+ * Evita problemas de conversão UTC que podem alterar o dia
+ */
+export function formatDateForForm(date: Date): string {
+	return dayjs(date).format("YYYY-MM-DD");
+}
+
+/**
+ * Converte uma string de data (YYYY-MM-DD) para objeto Date de forma segura
+ * Evita problemas de interpretação UTC que podem alterar o dia
+ */
+export function parseDateFromString(dateString: string): Date {
+	// Use dayjs para fazer o parsing da string de forma segura
+	// Isso evita problemas de fuso horário que ocorrem com new Date("YYYY-MM-DD")
+	const parsed = dayjs(dateString, "YYYY-MM-DD");
+
+	if (!parsed.isValid()) {
+		throw new Error(`Data inválida: ${dateString}`);
+	}
+
+	return parsed.toDate();
 }
