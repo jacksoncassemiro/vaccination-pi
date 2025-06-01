@@ -225,7 +225,7 @@ export default function PatientFormPage() {
 				</Stack>
 				<Group justify="flex-end" mt="xl">
 					<Button type="submit" loading={isPending} size="md">
-						{patientId ? "Atualizar" : "Cadastrar"} Paciente
+						{patientId ? "Atualizar" : "Cadastrar"}
 					</Button>
 				</Group>
 			</form>

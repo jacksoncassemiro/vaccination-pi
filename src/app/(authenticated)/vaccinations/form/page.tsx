@@ -159,7 +159,7 @@ export default function VaccinationFormPage() {
 				</Stack>
 				<Group justify="flex-end" mt="xl">
 					<Button type="submit" loading={isPending} size="md">
-						{isEditing ? "Atualizar" : "Registrar"} Vacinação
+						{isEditing ? "Atualizar" : "Cadastrar"}
 					</Button>
 				</Group>
 			</form>
