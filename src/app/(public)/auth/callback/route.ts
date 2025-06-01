@@ -17,6 +17,14 @@ export async function GET(request: Request) {
 			const isLocalEnv = process.env.NODE_ENV === "development";
 			const isLocalhost = origin.includes("localhost");
 
+			console.log("Redirecionando após login bem-sucedido:", {
+				origin,
+				forwardedHost,
+				isLocalEnv,
+				isLocalhost,
+				next,
+			});
+
 			if (isLocalhost || isLocalEnv) {
 				// Forçar HTTP para localhost (desenvolvimento ou produção local)
 				let redirectUrl = origin;
