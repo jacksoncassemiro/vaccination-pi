@@ -2,8 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { ReactNode } from "react";
-import { AppHeader } from "./layouts/AppHeader";
-import { BaseAppShell } from "./layouts/BaseAppShell";
+import { AppHeader, BaseAppShell } from ".";
 
 interface AppPublicLayoutProps {
 	children: ReactNode;

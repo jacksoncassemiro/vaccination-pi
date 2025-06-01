@@ -1,6 +1,5 @@
 "use client";
 
-import { VaccineFormFields } from "@/components/VaccineFormFields";
 import { vaccineSchema, type VaccineFormData } from "@/schemas/vaccineSchema";
 import { Button, Group, Stack, Title } from "@mantine/core";
 import { useForm } from "@mantine/form";
@@ -10,6 +9,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useEffect, useTransition } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { createVaccine, getVaccineById, updateVaccine } from "../actions";
+import { VaccineFormFields } from "@/components";
 
 export default function VaccineFormPage() {
 	const router = useRouter();

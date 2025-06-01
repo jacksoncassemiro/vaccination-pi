@@ -9,7 +9,7 @@ import { Grid, Stack, TextInput, Textarea } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { type UseFormReturnType } from "@mantine/form";
 import { useEffect, useState } from "react";
-import { SearchableSelect } from "./common/SearchableSelect";
+import { SearchableSelect } from "..";
 
 interface VaccinationFormFieldsProps {
 	form: UseFormReturnType<VaccinationFormData>;

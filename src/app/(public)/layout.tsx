@@ -1,4 +1,4 @@
-import { AppPublicLayout } from "@/components/AppPublicLayout";
+import { AppPublicLayout } from "@/components";
 
 export default function PublicLayout({
 	children,

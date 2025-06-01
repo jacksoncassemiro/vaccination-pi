@@ -3,7 +3,7 @@
 import { Container, Group, Text, UnstyledButton } from "@mantine/core";
 import { useRouter } from "next/navigation";
 import { ReactNode } from "react";
-import { Logo } from "../Logo";
+import { Logo } from "..";
 
 interface AppHeaderProps {
 	/** Título da aplicação */

@@ -11,7 +11,7 @@ import { DatePickerInput } from "@mantine/dates";
 import { notifications } from "@mantine/notifications";
 import { useEffect, useState } from "react";
 import { FaDownload, FaFilter } from "react-icons/fa";
-import { SearchableSelect } from "../common/SearchableSelect";
+import { SearchableSelect } from "..";
 
 interface DashboardFiltersProps {
 	filters: DashboardFilterValues;

@@ -2,7 +2,7 @@
 
 import { AppShell, Container, Stack } from "@mantine/core";
 import { ReactNode } from "react";
-import { ConnectionStatus } from "../ConnectionStatus";
+import { ConnectionStatus } from "..";
 
 interface BaseAppShellProps {
 	children: ReactNode;

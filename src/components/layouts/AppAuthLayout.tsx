@@ -5,10 +5,8 @@ import { Burger, Group } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { usePathname } from "next/navigation";
 import { ReactNode, useEffect } from "react";
-import { AppHeader } from "./layouts/AppHeader";
-import { AuthDesktopNav, AuthNavbar } from "./layouts/AuthNavbar";
-import { BaseAppShell } from "./layouts/BaseAppShell";
-import { UserMenu } from "./UserMenu";
+import { AppHeader, AuthDesktopNav, AuthNavbar, BaseAppShell } from ".";
+import { UserMenu } from "..";
 
 interface AppAuthLayoutProps {
 	children: ReactNode;

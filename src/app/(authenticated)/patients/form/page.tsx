@@ -1,6 +1,5 @@
 "use client";
 
-import { PatientFormFields } from "@/components/PatientFormFields";
 import { fetchAddressByCep } from "@/lib/viaCep";
 import { patientSchema, type PatientFormData } from "@/schemas/patientSchema";
 import { Button, Group, Stack, Title } from "@mantine/core";
@@ -12,6 +11,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useState, useTransition } from "react";
 import { FaArrowLeft } from "react-icons/fa";
 import { createPatient, getPatientById, updatePatient } from "../actions";
+import { PatientFormFields } from "@/components";
 
 export default function PatientFormPage() {
 	const router = useRouter();
