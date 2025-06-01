@@ -53,13 +53,23 @@ export function SearchableSelect({
 			}
 		}
 	}, [value, data, initialData]);
-
 	// Função de busca com debounce
 	const debouncedSearch = useDebouncedCallback(async (term: string) => {
 		if (!term.trim()) {
 			// Se não há termo de busca, retorna aos dados iniciais
 			setData(initialData);
 			setLoading(false);
+			return;
+		}
+
+		// Verificar se o termo de busca corresponde exatamente ao label de um item existente
+		// Se sim, não faz busca desnecessária
+		const existingItem = [...data, ...initialData].find(
+			(item) => item.label.toLowerCase() === term.toLowerCase()
+		);
+
+		if (existingItem) {
+			// Se o termo corresponde a um item existente, não faz busca
 			return;
 		}
 
@@ -83,8 +93,8 @@ export function SearchableSelect({
 			setLoading(false);
 		}
 	}, debounceMs);
-
 	// Handler para mudanças no valor de busca - SEM estado controlado
+	// Otimização: evita buscas desnecessárias quando o usuário seleciona um item existente
 	const handleSearchChange = (searchValue: string) => {
 		debouncedSearch(searchValue);
 	};
