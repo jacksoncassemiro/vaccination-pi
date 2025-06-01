@@ -3,7 +3,8 @@
 import { useAuth } from "@/contexts";
 import { Burger, Group } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
-import { ReactNode } from "react";
+import { usePathname } from "next/navigation";
+import { ReactNode, useEffect } from "react";
 import { AppHeader } from "./layouts/AppHeader";
 import { AuthDesktopNav, AuthNavbar } from "./layouts/AuthNavbar";
 import { BaseAppShell } from "./layouts/BaseAppShell";
@@ -23,7 +24,14 @@ export function AppAuthLayout({
 	showUserMenu = true,
 }: AppAuthLayoutProps) {
 	const { user } = useAuth();
-	const [mobileOpened, { toggle: toggleMobile }] = useDisclosure();
+	const [mobileOpened, { toggle: toggleMobile, close: closeMobile }] =
+		useDisclosure();
+	const pathname = usePathname();
+
+	// Fecha o menu mobile automaticamente quando a rota muda
+	useEffect(() => {
+		closeMobile();
+	}, [pathname, closeMobile]);
 
 	return (
 		<BaseAppShell
