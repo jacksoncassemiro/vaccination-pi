@@ -1,6 +1,7 @@
 "use client";
 
 import { CrudPageLayout, VaccinesTable } from "@/components";
+import { CRUD_BUTTON_LABELS } from "@/constants";
 import { useCrudPage, usePdfExport } from "@/hooks";
 import type { Vaccine } from "@/types/vaccines";
 import { deleteVaccine, getVaccines } from "./actions";
@@ -49,7 +50,7 @@ export default function VaccinesPage() {
 	return (
 		<CrudPageLayout
 			title="Vacinas"
-			addButtonLabel="Nova Vacina"
+			addButtonLabel={CRUD_BUTTON_LABELS.vaccines}
 			searchPlaceholder="Buscar por tipo ou fabricante..."
 			searchValue={search}
 			onSearchChange={handleSearchChange}

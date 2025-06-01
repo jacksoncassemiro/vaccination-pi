@@ -1,5 +1,6 @@
 "use client";
 
+import { CRUD_ACTION_COLORS } from "@/constants";
 import type { Patient } from "@/types/patients";
 import {
 	ActionIcon,
@@ -169,7 +170,7 @@ export function PatientsTable({
 											<Tooltip label="Editar paciente">
 												<ActionIcon
 													variant="subtle"
-													color="blue"
+													color={CRUD_ACTION_COLORS.edit}
 													size="sm"
 													onClick={() => onEdit(patient)}
 												>
@@ -180,7 +181,7 @@ export function PatientsTable({
 												<Tooltip label="Exportar PDF">
 													<ActionIcon
 														variant="subtle"
-														color="green"
+														color={CRUD_ACTION_COLORS.export}
 														size="sm"
 														onClick={() => onExportPdf(patient)}
 													>
@@ -193,7 +194,7 @@ export function PatientsTable({
 											<Tooltip label="Excluir paciente">
 												<ActionIcon
 													variant="subtle"
-													color="red"
+													color={CRUD_ACTION_COLORS.delete}
 													size="sm"
 													onClick={() => handleDelete(patient)}
 												>

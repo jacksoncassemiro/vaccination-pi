@@ -81,7 +81,6 @@ export function VaccinationFormFields({
 		<Stack gap="md">
 			<Grid>
 				<Grid.Col span={{ base: 12, sm: 6 }}>
-					{" "}
 					<SearchableSelect
 						label="Paciente"
 						placeholder="Busque e selecione o paciente..."

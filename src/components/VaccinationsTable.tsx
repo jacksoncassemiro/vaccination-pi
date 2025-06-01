@@ -1,5 +1,6 @@
 "use client";
 
+import { CRUD_ACTION_COLORS } from "@/constants";
 import type { VaccinationRecordWithDetails } from "@/types/vaccinations";
 import {
 	ActionIcon,
@@ -129,10 +130,20 @@ export function VaccinationsTable({
 							</Table.Td>
 							<Table.Td>
 								<Group gap="xs">
+									<Tooltip label="Editar">
+										<ActionIcon
+											variant="subtle"
+											color={CRUD_ACTION_COLORS.edit}
+											size="sm"
+											onClick={() => onEdit(vaccination)}
+										>
+											<FaEdit style={{ width: rem(16), height: rem(16) }} />
+										</ActionIcon>
+									</Tooltip>
 									<Tooltip label="Exportar PDF">
 										<ActionIcon
 											variant="subtle"
-											color="blue"
+											color={CRUD_ACTION_COLORS.export}
 											size="sm"
 											onClick={() => onExportPdf(vaccination)}
 										>
@@ -141,20 +152,10 @@ export function VaccinationsTable({
 											/>
 										</ActionIcon>
 									</Tooltip>
-									<Tooltip label="Editar">
-										<ActionIcon
-											variant="subtle"
-											color="gray"
-											size="sm"
-											onClick={() => onEdit(vaccination)}
-										>
-											<FaEdit style={{ width: rem(16), height: rem(16) }} />
-										</ActionIcon>
-									</Tooltip>
 									<Tooltip label="Excluir">
 										<ActionIcon
 											variant="subtle"
-											color="red"
+											color={CRUD_ACTION_COLORS.delete}
 											size="sm"
 											onClick={() => handleDelete(vaccination)}
 										>

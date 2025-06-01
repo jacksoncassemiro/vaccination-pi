@@ -1,6 +1,7 @@
 "use client";
 
 import { CrudPageLayout, VaccinationsTable } from "@/components";
+import { CRUD_BUTTON_LABELS } from "@/constants";
 import { useCrudPage, usePdfExport } from "@/hooks";
 import type { VaccinationRecordWithDetails } from "@/types/vaccinations";
 import { deleteVaccination, getVaccinations } from "./actions";
@@ -49,11 +50,10 @@ export default function VaccinationsPage() {
 	) => {
 		exportVaccinationToPdf(vaccination);
 	};
-
 	return (
 		<CrudPageLayout
 			title="Vacinações"
-			addButtonLabel="Nova Vacinação"
+			addButtonLabel={CRUD_BUTTON_LABELS.vaccinations}
 			searchPlaceholder="Buscar por paciente, vacina ou local..."
 			searchValue={search}
 			onSearchChange={handleSearchChange}

@@ -1,6 +1,7 @@
 "use client";
 
 import { CrudPageLayout, PatientsTable } from "@/components";
+import { CRUD_BUTTON_LABELS } from "@/constants";
 import { useCrudPage, usePdfExport } from "@/hooks";
 import type { Patient } from "@/types/patients";
 import { deletePatient, getPatients } from "./actions";
@@ -51,7 +52,7 @@ export default function PatientsPage() {
 	return (
 		<CrudPageLayout
 			title="Pacientes"
-			addButtonLabel="Novo Paciente"
+			addButtonLabel={CRUD_BUTTON_LABELS.patients}
 			searchPlaceholder="Buscar por nome, CPF ou telefone..."
 			searchValue={search}
 			onSearchChange={handleSearchChange}
