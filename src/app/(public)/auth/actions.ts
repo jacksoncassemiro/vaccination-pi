@@ -30,6 +30,7 @@ export async function signInWithGoogle() {
 	}
 
 	if (data.url) {
+		console.log("Redirecionando para:", data.url);
 		redirect(data.url);
 	}
 }
