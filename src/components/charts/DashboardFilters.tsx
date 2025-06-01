@@ -5,16 +5,19 @@ import {
 	getUserVaccines,
 	type PeriodFilter,
 } from "@/app/(authenticated)/vaccinations/actions";
+import { usePdfExport, type DashboardData } from "@/hooks/usePdfExport";
 import { Button, Group, Paper, Select, Stack, Text } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
+import { notifications } from "@mantine/notifications";
 import { useEffect, useState } from "react";
-import { FaFilter } from "react-icons/fa";
+import { FaDownload, FaFilter } from "react-icons/fa";
 import { SearchableSelect } from "../common/SearchableSelect";
 
 interface DashboardFiltersProps {
 	filters: DashboardFilterValues;
 	onFiltersChange: (filters: DashboardFilterValues) => void;
 	loading?: boolean;
+	dashboardData?: DashboardData | null;
 }
 
 export interface DashboardFilterValues {
@@ -49,6 +52,7 @@ export function DashboardFilters({
 	filters,
 	onFiltersChange,
 	loading: filtersLoading,
+	dashboardData,
 }: DashboardFiltersProps) {
 	const [localFilters, setLocalFilters] =
 		useState<DashboardFilterValues>(filters);
@@ -59,6 +63,9 @@ export function DashboardFilters({
 		Array<{ value: string; label: string }>
 	>([]);
 	const [dataLoading, setDataLoading] = useState(true);
+	const [exportLoading, setExportLoading] = useState(false);
+
+	const { exportDashboardToPdf } = usePdfExport();
 
 	// Carregar dados iniciais
 	useEffect(() => {
@@ -142,12 +149,52 @@ export function DashboardFilters({
 			return [];
 		}
 	};
-
 	// Verificar se há mudanças nos filtros
 	const hasChanges = JSON.stringify(localFilters) !== JSON.stringify(filters);
 
 	// Determinar o estado de loading (dados iniciais ou filtros)
 	const isLoading = filtersLoading || dataLoading;
+
+	// Função para exportar dashboard em PDF
+	const handleExportPDF = async () => {
+		if (!dashboardData) {
+			notifications.show({
+				title: "Erro",
+				message: "Não há dados disponíveis para exportar",
+				color: "red",
+			});
+			return;
+		}
+
+		try {
+			setExportLoading(true);
+
+			const result = await exportDashboardToPdf(dashboardData, filters);
+
+			if (result.success) {
+				notifications.show({
+					title: "Sucesso",
+					message: `Relatório exportado como ${result.fileName}`,
+					color: "green",
+				});
+			} else {
+				notifications.show({
+					title: "Erro",
+					message: result.error || "Falha ao exportar relatório",
+					color: "red",
+				});
+			}
+		} catch (error) {
+			console.error("Erro ao exportar PDF:", error);
+			notifications.show({
+				title: "Erro",
+				message: "Falha ao exportar relatório",
+				color: "red",
+			});
+		} finally {
+			setExportLoading(false);
+		}
+	};
 
 	return (
 		<Paper p="md" withBorder>
@@ -158,7 +205,6 @@ export function DashboardFilters({
 						Filtros
 					</Text>
 				</Group>
-
 				<Group grow>
 					<Select
 						label="Período"
@@ -178,7 +224,6 @@ export function DashboardFilters({
 						disabled={isLoading}
 					/>
 				</Group>
-
 				<Group grow>
 					<SearchableSelect
 						label="Tipo de Vacina"
@@ -201,7 +246,6 @@ export function DashboardFilters({
 						clearable
 					/>
 				</Group>
-
 				{localFilters.period === "custom" && (
 					<Group grow>
 						<DatePickerInput
@@ -225,16 +269,28 @@ export function DashboardFilters({
 						/>
 					</Group>
 				)}
-
 				<Group justify="space-between">
-					<Button
-						variant="subtle"
-						onClick={handleReset}
-						disabled={isLoading}
-						size="sm"
-					>
-						Limpar filtros
-					</Button>
+					<Group>
+						<Button
+							variant="subtle"
+							onClick={handleReset}
+							disabled={isLoading}
+							size="sm"
+						>
+							Limpar filtros
+						</Button>
+
+						<Button
+							leftSection={<FaDownload size={14} />}
+							variant="outline"
+							onClick={handleExportPDF}
+							disabled={isLoading || !dashboardData || exportLoading}
+							loading={exportLoading}
+							size="sm"
+						>
+							Exportar PDF
+						</Button>
+					</Group>
 
 					<Button
 						onClick={handleApplyFilters}

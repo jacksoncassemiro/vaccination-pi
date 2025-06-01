@@ -109,10 +109,8 @@ export default function HomePage() {
 			}
 		}
 
-		if (user && !authLoading) {
-			fetchDashboardData();
-		}
-	}, [user, authLoading, filters.period]);
+		fetchDashboardData();
+	}, [filters.period]);
 	const handleFiltersChange = async (newFilters: DashboardFilterValues) => {
 		setFilters(newFilters);
 
@@ -205,6 +203,7 @@ export default function HomePage() {
 				filters={filters}
 				onFiltersChange={handleFiltersChange}
 				loading={loading}
+				dashboardData={dashboardData}
 			/>
 			{/* Indicadores de Saúde */}
 			<HealthIndicators

@@ -5,11 +5,43 @@ import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { useCallback } from "react";
 
+// Estender o tipo jsPDF para incluir lastAutoTable
+interface jsPDFWithAutoTable extends jsPDF {
+	lastAutoTable: {
+		finalY: number;
+	};
+}
+
 export interface PdfExportOptions {
 	title?: string;
 	includeHeader?: boolean;
 	includeFooter?: boolean;
 	orientation?: "portrait" | "landscape";
+}
+
+export interface DashboardData {
+	stats: {
+		totalPatients: number;
+		totalVaccines: number;
+		totalVaccinations: number;
+	};
+	vaccinationsByType: Array<{ name: string; value: number; color: string }>;
+	vaccinationsByMonth: Array<{ month: string; vacinações: number }>;
+	patientsByAge: Array<{ group: string; pacientes: number }>;
+	healthIndicators: {
+		vaccinations7Days: number;
+		vaccinations30Days: number;
+		activePatients: number;
+		inactivePatients: number;
+		vaccinationRate: number;
+		trends: {
+			weeklyGrowth: number;
+			monthlyTotal: number;
+		};
+	} | null;
+	weeklyTrends: Array<{ semana: string; vacinações: number }>;
+	hourlyDistribution: Array<{ hour: string; vacinações: number }>;
+	locationDistribution: Array<{ name: string; value: number; color: string }>;
 }
 
 export function usePdfExport() {
@@ -585,6 +617,395 @@ export function usePdfExport() {
 		},
 		[]
 	);
+
+	const exportDashboardToPdf = useCallback(
+		async (
+			dashboardData: DashboardData,
+			filters?: {
+				period?: string;
+				vaccineType?: string;
+				ageGroup?: string;
+				patientId?: string;
+			},
+			options: PdfExportOptions = {}
+		) => {
+			const {
+				title = "Relatório do Dashboard - Sistema de Vacinação",
+				includeHeader = true,
+				includeFooter = true,
+				orientation = "portrait",
+			} = options;
+
+			try {
+				const doc = new jsPDF({
+					orientation,
+					unit: "mm",
+					format: "a4",
+				});
+
+				doc.setFont("helvetica");
+				let currentY = 20;
+				const pageWidth = doc.internal.pageSize.width;
+				const pageHeight = doc.internal.pageSize.height;
+
+				// Cabeçalho
+				if (includeHeader) {
+					doc.setFontSize(16);
+					doc.setFont("helvetica", "bold");
+					doc.text(title, pageWidth / 2, currentY, { align: "center" });
+					currentY += 10;
+
+					doc.setFontSize(10);
+					doc.setFont("helvetica", "normal");
+					doc.text(
+						`Gerado em: ${new Date().toLocaleDateString(
+							"pt-BR"
+						)} às ${new Date().toLocaleTimeString("pt-BR")}`,
+						pageWidth / 2,
+						currentY,
+						{ align: "center" }
+					);
+					currentY += 15;
+
+					// Informações dos filtros aplicados
+					if (filters) {
+						doc.setFontSize(12);
+						doc.setFont("helvetica", "bold");
+						doc.text("Filtros Aplicados:", 14, currentY);
+						currentY += 8;
+
+						doc.setFontSize(10);
+						doc.setFont("helvetica", "normal");
+
+						if (filters.period) {
+							doc.text(`• Período: ${filters.period}`, 14, currentY);
+							currentY += 6;
+						}
+						if (filters.vaccineType) {
+							doc.text(
+								`• Tipo de Vacina: ${filters.vaccineType}`,
+								14,
+								currentY
+							);
+							currentY += 6;
+						}
+						if (filters.ageGroup) {
+							doc.text(`• Faixa Etária: ${filters.ageGroup}`, 14, currentY);
+							currentY += 6;
+						}
+						if (filters.patientId) {
+							doc.text(
+								`• Paciente Específico: ID ${filters.patientId}`,
+								14,
+								currentY
+							);
+							currentY += 6;
+						}
+						currentY += 10;
+					}
+				}
+
+				// Estatísticas Gerais
+				doc.setFontSize(14);
+				doc.setFont("helvetica", "bold");
+				doc.text("ESTATÍSTICAS GERAIS", 14, currentY);
+				currentY += 10;
+
+				const statsData = [
+					["Total de Pacientes", dashboardData.stats.totalPatients.toString()],
+					["Total de Vacinas", dashboardData.stats.totalVaccines.toString()],
+					[
+						"Total de Vacinações",
+						dashboardData.stats.totalVaccinations.toString(),
+					],
+				];
+				autoTable(doc, {
+					body: statsData,
+					startY: currentY,
+					styles: {
+						fontSize: 10,
+						cellPadding: 4,
+					},
+					columnStyles: {
+						0: { fontStyle: "bold", cellWidth: 60 },
+						1: { cellWidth: 40, halign: "center" },
+					},
+					theme: "grid",
+				});
+
+				currentY = (doc as jsPDFWithAutoTable).lastAutoTable.finalY + 15;
+
+				// Indicadores de Saúde
+				if (dashboardData.healthIndicators) {
+					doc.setFontSize(14);
+					doc.setFont("helvetica", "bold");
+					doc.text("INDICADORES DE SAÚDE", 14, currentY);
+					currentY += 10;
+
+					const healthData = [
+						[
+							"Vacinações (7 dias)",
+							dashboardData.healthIndicators.vaccinations7Days.toString(),
+						],
+						[
+							"Vacinações (30 dias)",
+							dashboardData.healthIndicators.vaccinations30Days.toString(),
+						],
+						[
+							"Pacientes Ativos",
+							dashboardData.healthIndicators.activePatients.toString(),
+						],
+						[
+							"Pacientes Inativos",
+							dashboardData.healthIndicators.inactivePatients.toString(),
+						],
+						[
+							"Taxa de Vacinação",
+							`${dashboardData.healthIndicators.vaccinationRate.toFixed(1)}%`,
+						],
+						[
+							"Crescimento Semanal",
+							`${dashboardData.healthIndicators.trends.weeklyGrowth.toFixed(
+								1
+							)}%`,
+						],
+						[
+							"Total Mensal",
+							dashboardData.healthIndicators.trends.monthlyTotal.toString(),
+						],
+					];
+					autoTable(doc, {
+						body: healthData,
+						startY: currentY,
+						styles: {
+							fontSize: 10,
+							cellPadding: 4,
+						},
+						columnStyles: {
+							0: { fontStyle: "bold", cellWidth: 80 },
+							1: { cellWidth: 40, halign: "center" },
+						},
+						theme: "grid",
+					});
+
+					currentY = (doc as jsPDFWithAutoTable).lastAutoTable.finalY + 15;
+				}
+
+				// Verificar se precisa de nova página
+				if (currentY > pageHeight - 60) {
+					doc.addPage();
+					currentY = 20;
+				}
+
+				// Vacinações por Tipo
+				if (dashboardData.vaccinationsByType.length > 0) {
+					doc.setFontSize(14);
+					doc.setFont("helvetica", "bold");
+					doc.text("VACINAÇÕES POR TIPO", 14, currentY);
+					currentY += 10;
+
+					const typeData = dashboardData.vaccinationsByType.map((item) => [
+						item.name,
+						item.value.toString(),
+						`${(
+							(item.value / dashboardData.stats.totalVaccinations) *
+							100
+						).toFixed(1)}%`,
+					]);
+					autoTable(doc, {
+						head: [["Tipo de Vacina", "Quantidade", "Percentual"]],
+						body: typeData,
+						startY: currentY,
+						styles: {
+							fontSize: 10,
+							cellPadding: 3,
+						},
+						headStyles: {
+							fillColor: [79, 70, 229],
+							textColor: 255,
+							fontStyle: "bold",
+						},
+						alternateRowStyles: {
+							fillColor: [245, 245, 245],
+						},
+						columnStyles: {
+							0: { cellWidth: 80 },
+							1: { cellWidth: 30, halign: "center" },
+							2: { cellWidth: 30, halign: "center" },
+						},
+					});
+
+					currentY = (doc as jsPDFWithAutoTable).lastAutoTable.finalY + 15;
+				}
+
+				// Verificar se precisa de nova página
+				if (currentY > pageHeight - 60) {
+					doc.addPage();
+					currentY = 20;
+				}
+
+				// Pacientes por Faixa Etária
+				if (dashboardData.patientsByAge.length > 0) {
+					doc.setFontSize(14);
+					doc.setFont("helvetica", "bold");
+					doc.text("PACIENTES POR FAIXA ETÁRIA", 14, currentY);
+					currentY += 10;
+
+					const ageData = dashboardData.patientsByAge.map((item) => [
+						item.group,
+						item.pacientes.toString(),
+						`${(
+							(item.pacientes / dashboardData.stats.totalPatients) *
+							100
+						).toFixed(1)}%`,
+					]);
+					autoTable(doc, {
+						head: [["Faixa Etária", "Quantidade", "Percentual"]],
+						body: ageData,
+						startY: currentY,
+						styles: {
+							fontSize: 10,
+							cellPadding: 3,
+						},
+						headStyles: {
+							fillColor: [79, 70, 229],
+							textColor: 255,
+							fontStyle: "bold",
+						},
+						alternateRowStyles: {
+							fillColor: [245, 245, 245],
+						},
+						columnStyles: {
+							0: { cellWidth: 60 },
+							1: { cellWidth: 30, halign: "center" },
+							2: { cellWidth: 30, halign: "center" },
+						},
+					});
+
+					currentY = (doc as jsPDFWithAutoTable).lastAutoTable.finalY + 15;
+				}
+
+				// Nova página para dados mensais
+				if (dashboardData.vaccinationsByMonth.length > 0) {
+					doc.addPage();
+					currentY = 20;
+
+					doc.setFontSize(14);
+					doc.setFont("helvetica", "bold");
+					doc.text("VACINAÇÕES POR MÊS", 14, currentY);
+					currentY += 10;
+
+					const monthData = dashboardData.vaccinationsByMonth.map((item) => [
+						item.month,
+						item.vacinações.toString(),
+					]);
+					autoTable(doc, {
+						head: [["Mês", "Vacinações"]],
+						body: monthData,
+						startY: currentY,
+						styles: {
+							fontSize: 10,
+							cellPadding: 3,
+						},
+						headStyles: {
+							fillColor: [79, 70, 229],
+							textColor: 255,
+							fontStyle: "bold",
+						},
+						alternateRowStyles: {
+							fillColor: [245, 245, 245],
+						},
+						columnStyles: {
+							0: { cellWidth: 80 },
+							1: { cellWidth: 40, halign: "center" },
+						},
+					});
+
+					currentY = (doc as jsPDFWithAutoTable).lastAutoTable.finalY + 15;
+				}
+
+				// Distribuição por Local
+				if (dashboardData.locationDistribution.length > 0) {
+					if (currentY > pageHeight - 100) {
+						doc.addPage();
+						currentY = 20;
+					}
+
+					doc.setFontSize(14);
+					doc.setFont("helvetica", "bold");
+					doc.text("DISTRIBUIÇÃO POR LOCAL", 14, currentY);
+					currentY += 10;
+
+					const locationData = dashboardData.locationDistribution.map(
+						(item) => [
+							item.name,
+							item.value.toString(),
+							`${(
+								(item.value / dashboardData.stats.totalVaccinations) *
+								100
+							).toFixed(1)}%`,
+						]
+					);
+
+					autoTable(doc, {
+						head: [["Local", "Quantidade", "Percentual"]],
+						body: locationData,
+						startY: currentY,
+						styles: {
+							fontSize: 10,
+							cellPadding: 3,
+						},
+						headStyles: {
+							fillColor: [79, 70, 229],
+							textColor: 255,
+							fontStyle: "bold",
+						},
+						alternateRowStyles: {
+							fillColor: [245, 245, 245],
+						},
+						columnStyles: {
+							0: { cellWidth: 80 },
+							1: { cellWidth: 30, halign: "center" },
+							2: { cellWidth: 30, halign: "center" },
+						},
+					});
+				}
+
+				// Rodapé
+				if (includeFooter) {
+					const pageCount = doc.getNumberOfPages();
+					for (let i = 1; i <= pageCount; i++) {
+						doc.setPage(i);
+						doc.setFontSize(8);
+						doc.setFont("helvetica", "normal");
+						doc.text(`Página ${i} de ${pageCount}`, 14, pageHeight - 10);
+						doc.text(
+							"Sistema de Vacinação - Relatório Dashboard",
+							pageWidth - 14,
+							pageHeight - 10,
+							{ align: "right" }
+						);
+					}
+				}
+
+				// Salvar o arquivo
+				const fileName = `dashboard_relatorio_${
+					new Date().toISOString().split("T")[0]
+				}.pdf`;
+				doc.save(fileName);
+
+				return { success: true, fileName };
+			} catch (error) {
+				console.error("Erro ao gerar PDF do dashboard:", error);
+				return {
+					success: false,
+					error: error instanceof Error ? error.message : "Erro desconhecido",
+				};
+			}
+		},
+		[]
+	);
+
 	return {
 		exportPatientsToPdf,
 		exportPatientToPdf,
@@ -592,5 +1013,6 @@ export function usePdfExport() {
 		exportVaccineToPdf,
 		exportVaccinationsToPdf,
 		exportVaccinationToPdf,
+		exportDashboardToPdf,
 	};
 }
