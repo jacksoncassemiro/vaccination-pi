@@ -199,7 +199,7 @@ export default function HomePage() {
 					Olá, {user.user_metadata?.full_name || user.email}! Aqui está um
 					resumo dos seus dados de vacinação.
 				</Alert>
-			)}{" "}
+			)}
 			{/* Filtros Avançados */}
 			<DashboardFilters
 				filters={filters}

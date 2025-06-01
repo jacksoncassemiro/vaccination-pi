@@ -42,7 +42,7 @@ export function WeeklyTrendsChart({ data, loading }: WeeklyTrendsChartProps) {
 		<Paper p="md" withBorder>
 			<Title order={4} mb="md">
 				Tendências Semanais (12 semanas)
-			</Title>{" "}
+			</Title>
 			<LineChart
 				h={300}
 				data={data}

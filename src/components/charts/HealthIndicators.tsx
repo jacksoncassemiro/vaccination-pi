@@ -158,7 +158,7 @@ export function HealthIndicators({
 						label: "vs. semana anterior",
 					}}
 					loading={loading}
-				/>{" "}
+				/>
 				<AdvancedStatsCard
 					title="Vacinações (30 dias)"
 					value={stats.vaccinations30Days}

@@ -43,7 +43,6 @@ interface DashboardStatsProps {
 export function DashboardStats({ stats, loading }: DashboardStatsProps) {
 	return (
 		<>
-			{" "}
 			<StatsCard
 				title="Total de Pacientes"
 				value={stats.totalPatients}
