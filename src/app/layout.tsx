@@ -1,7 +1,6 @@
 import { getBaseUrl } from "@/utils";
 import type { Metadata } from "next";
 import { ColorSchemeScript, mantineHtmlProps } from "@mantine/core";
-import "../styles/globals.css";
 import { MantineAllProviders } from "@/contexts";
 
 export const metadata: Metadata = {
