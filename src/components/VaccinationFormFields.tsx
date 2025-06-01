@@ -5,104 +5,50 @@ import {
 	getUserVaccines,
 } from "@/app/(authenticated)/vaccinations/actions";
 import { type VaccinationFormData } from "@/schemas/vaccinationSchema";
-import {
-	Grid,
-	Loader,
-	Select,
-	Stack,
-	TextInput,
-	Textarea,
-} from "@mantine/core";
+import { Grid, Stack, TextInput, Textarea } from "@mantine/core";
 import { DatePickerInput } from "@mantine/dates";
 import { type UseFormReturnType } from "@mantine/form";
-import { useDebouncedCallback } from "@mantine/hooks";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
+import { SearchableSelect } from "./common/SearchableSelect";
 
 interface VaccinationFormFieldsProps {
 	form: UseFormReturnType<VaccinationFormData>;
 	disabled?: boolean;
 }
 
-interface Patient {
-	id: string;
-	full_name: string;
-	cpf: string;
-}
-
-interface Vaccine {
-	id: string;
-	type: string;
-	manufacturer: string;
-}
-
 export function VaccinationFormFields({
 	form,
 	disabled,
 }: VaccinationFormFieldsProps) {
-	const [patients, setPatients] = useState<Patient[]>([]);
-	const [vaccines, setVaccines] = useState<Vaccine[]>([]);
+	const [initialPatients, setInitialPatients] = useState<
+		Array<{ value: string; label: string }>
+	>([]);
+	const [initialVaccines, setInitialVaccines] = useState<
+		Array<{ value: string; label: string }>
+	>([]);
 	const [loading, setLoading] = useState(true);
-	// Estados de busca para cada select
-	const [patientSearchTerm, setPatientSearchTerm] = useState("");
-	const [vaccineSearchTerm, setVaccineSearchTerm] = useState("");
 
-	// Refs para armazenar valores anteriores dos termos de busca
-	const prevPatientSearchTerm = useRef("");
-	const prevVaccineSearchTerm = useRef("");
-
-	// Estados de loading para feedback visual
-	const [searchingPatients, setSearchingPatients] = useState(false);
-	const [searchingVaccines, setSearchingVaccines] = useState(false);
-	// Callbacks de busca com debounce
-	const debouncedPatientSearch = useDebouncedCallback(
-		async (searchTerm: string) => {
-			// Só busca se há um termo de pesquisa não vazio
-			if (!searchTerm.trim()) {
-				return;
-			}
-
-			setSearchingPatients(true);
-			try {
-				const searchResults = await getUserPatients(searchTerm, 10);
-				setPatients(searchResults);
-			} catch (error) {
-				console.error("Erro ao buscar pacientes:", error);
-			} finally {
-				setSearchingPatients(false);
-			}
-		},
-		300
-	);
-	const debouncedVaccineSearch = useDebouncedCallback(
-		async (searchTerm: string) => {
-			// Só busca se há um termo de pesquisa não vazio
-			if (!searchTerm.trim()) {
-				return;
-			}
-
-			setSearchingVaccines(true);
-			try {
-				const searchResults = await getUserVaccines(searchTerm, 10);
-				setVaccines(searchResults);
-			} catch (error) {
-				console.error("Erro ao buscar vacinas:", error);
-			} finally {
-				setSearchingVaccines(false);
-			}
-		},
-		300
-	);
-
-	// Carregar dados iniciais (primeiros 10 registros)
+	// Carregar dados iniciais
 	useEffect(() => {
 		const fetchInitialData = async () => {
 			try {
 				const [patientsData, vaccinesData] = await Promise.all([
-					getUserPatients("", 10), // Buscar os primeiros 10 pacientes
-					getUserVaccines("", 10), // Buscar as primeiras 10 vacinas
+					getUserPatients("", 10),
+					getUserVaccines("", 10),
 				]);
-				setPatients(patientsData);
-				setVaccines(vaccinesData);
+
+				const patientOptions = patientsData.map((patient) => ({
+					value: patient.id,
+					label: `${patient.full_name} - CPF: ${patient.cpf}`,
+				}));
+
+				const vaccineOptions = vaccinesData.map((vaccine) => ({
+					value: vaccine.id,
+					label: `${vaccine.type} - ${vaccine.manufacturer}`,
+				}));
+
+				setInitialPatients(patientOptions);
+				setInitialVaccines(vaccineOptions);
 			} catch (error) {
 				console.error("Erro ao carregar dados iniciais:", error);
 			} finally {
@@ -111,89 +57,49 @@ export function VaccinationFormFields({
 		};
 
 		fetchInitialData();
-	}, []); // Handlers para mudanças de busca
-	const handlePatientSearchChange = (searchTerm: string) => {
-		setPatientSearchTerm(searchTerm);
+	}, []);
 
-		// Se o campo foi limpo, restaura os dados iniciais apenas se o valor anterior não estava vazio
-		if (!searchTerm.trim()) {
-			if (prevPatientSearchTerm.current.trim()) {
-				getUserPatients("", 10).then(setPatients);
-			}
-			prevPatientSearchTerm.current = searchTerm;
-			return;
-		}
-
-		prevPatientSearchTerm.current = searchTerm;
-		debouncedPatientSearch(searchTerm);
+	// Função para buscar pacientes
+	const searchPatients = async (searchTerm: string) => {
+		const patients = await getUserPatients(searchTerm, 10);
+		return patients.map((patient) => ({
+			value: patient.id,
+			label: `${patient.full_name} - CPF: ${patient.cpf}`,
+		}));
 	};
 
-	const handleVaccineSearchChange = (searchTerm: string) => {
-		setVaccineSearchTerm(searchTerm);
-
-		// Se o campo foi limpo, restaura os dados iniciais apenas se o valor anterior não estava vazio
-		if (!searchTerm.trim()) {
-			if (prevVaccineSearchTerm.current.trim()) {
-				getUserVaccines("", 10).then(setVaccines);
-			}
-			prevVaccineSearchTerm.current = searchTerm;
-			return;
-		}
-
-		prevVaccineSearchTerm.current = searchTerm;
-		debouncedVaccineSearch(searchTerm);
+	// Função para buscar vacinas
+	const searchVaccines = async (searchTerm: string) => {
+		const vaccines = await getUserVaccines(searchTerm, 10);
+		return vaccines.map((vaccine) => ({
+			value: vaccine.id,
+			label: `${vaccine.type} - ${vaccine.manufacturer}`,
+		}));
 	};
-
-	const patientOptions = patients.map((patient) => ({
-		value: patient.id,
-		label: `${patient.full_name} - CPF: ${patient.cpf}`,
-	}));
-
-	const vaccineOptions = vaccines.map((vaccine) => ({
-		value: vaccine.id,
-		label: `${vaccine.type} - ${vaccine.manufacturer}`,
-	}));
 
 	return (
 		<Stack gap="md">
 			<Grid>
 				<Grid.Col span={{ base: 12, sm: 6 }}>
-					<Select
+					{" "}
+					<SearchableSelect
 						label="Paciente"
 						placeholder="Busque e selecione o paciente..."
-						data={patientOptions}
 						disabled={disabled || loading}
-						searchable
-						searchValue={patientSearchTerm}
-						onSearchChange={handlePatientSearchChange}
-						nothingFoundMessage={
-							searchingPatients
-								? "Pesquisando pacientes..."
-								: "Nenhum paciente encontrado..."
-						}
-						rightSection={searchingPatients ? <Loader size="xs" /> : undefined}
-						clearable
-						allowDeselect
+						onSearch={searchPatients}
+						initialData={initialPatients}
+						noResultsMessage="Nenhum paciente encontrado..."
 						{...form.getInputProps("patient_id")}
 					/>
 				</Grid.Col>
 				<Grid.Col span={{ base: 12, sm: 6 }}>
-					<Select
+					<SearchableSelect
 						label="Vacina"
 						placeholder="Busque e selecione a vacina..."
-						data={vaccineOptions}
 						disabled={disabled || loading}
-						searchable
-						searchValue={vaccineSearchTerm}
-						onSearchChange={handleVaccineSearchChange}
-						nothingFoundMessage={
-							searchingVaccines
-								? "Pesquisando vacinas..."
-								: "Nenhuma vacina encontrada..."
-						}
-						rightSection={searchingVaccines ? <Loader size="xs" /> : undefined}
-						clearable
-						allowDeselect
+						onSearch={searchVaccines}
+						initialData={initialVaccines}
+						noResultsMessage="Nenhuma vacina encontrada..."
 						{...form.getInputProps("vaccine_id")}
 					/>
 				</Grid.Col>

@@ -1,4 +1,5 @@
 export * from "./useAuth";
+export * from "./useCrudPage";
 export * from "./useFormCache";
 export * from "./useLocalStorage";
 export * from "./useOnlineStatus";
