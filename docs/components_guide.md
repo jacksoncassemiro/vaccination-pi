@@ -4,6 +4,10 @@ Esta seção documenta os principais componentes de UI reutilizáveis desenvolvi
 
 Para componentes da biblioteca Mantine UI, consulte a [documentação oficial do Mantine](https://mantine.dev/).
 
+[Voltar ao Índice](./index.md)
+
+---
+
 ## Estrutura dos Componentes
 
 Os componentes reutilizáveis estão localizados em `src/components/`. Eles são organizados nas seguintes subpastas:

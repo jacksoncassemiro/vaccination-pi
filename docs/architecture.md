@@ -1,5 +1,7 @@
 # Arquitetura do Sistema VacinaPI
 
+[Voltar ao Índice](./index.md)
+
 Este documento descreve a arquitetura do sistema VacinaPI, detalhando a estrutura do frontend, a interação com o backend (Supabase) e a organização geral do projeto.
 
 ## Visão Geral da Arquitetura
@@ -27,7 +29,6 @@ O frontend é construído utilizando Next.js com o App Router, o que permite uma
 - **React**: Biblioteca para construir interfaces de usuário componentizadas.
 - **Mantine UI**: Biblioteca de componentes React que fornece um conjunto rico de elementos de UI pré-construídos e customizáveis.
 - **TypeScript**: Adiciona tipagem estática ao JavaScript.
-- **Tailwind CSS**: (Integrado ao Mantine) Utilizado para estilizações utilitárias.
 - **Zod**: Para validação de esquemas de dados.
 - **Mantine Form**: Para gerenciamento de formulários, integrado com Zod (via `mantine-form-zod-resolver`).
 - **jsPDF & jsPDF-AutoTable**: Bibliotecas para a geração de relatórios em PDF.

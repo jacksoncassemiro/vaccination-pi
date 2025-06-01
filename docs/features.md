@@ -1,5 +1,7 @@
 # Funcionalidades do Sistema
 
+[Voltar ao Índice](./index.md)
+
 Esta seção descreve em detalhes cada uma das funcionalidades principais do sistema VacinaPI.
 
 ## Gerenciamento de Pacientes

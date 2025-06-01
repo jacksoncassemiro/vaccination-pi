@@ -2,6 +2,8 @@
 
 Agradecemos seu interesse em contribuir para o projeto VacinaPI! Para garantir um processo de contribuição tranquilo e eficaz, por favor, siga estas diretrizes.
 
+[Voltar ao Índice](./index.md)
+
 ## Como Contribuir
 
 Existem várias maneiras de contribuir para o projeto:

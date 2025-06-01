@@ -1,5 +1,7 @@
 # Solução de Problemas Comuns (Troubleshooting)
 
+[Voltar ao Índice](./index.md)
+
 Esta seção visa ajudar a resolver problemas comuns que podem surgir durante a configuração, desenvolvimento ou execução do projeto VacinaPI.
 
 ## Problemas de Configuração e Instalação
@@ -53,12 +55,11 @@ Esta seção visa ajudar a resolver problemas comuns que podem surgir durante a 
       - **Chamadas de API**: Se o componente depende de dados de uma API, verifique a aba "Network" nas ferramentas de desenvolvedor do navegador para garantir que as chamadas estão sendo feitas corretamente e retornando os dados esperados.
       - **Mensagens de Erro**: Analise cuidadosamente as mensagens de erro no console. Elas geralmente apontam para a origem do problema.
 
-3.  **Estilos CSS não aplicados corretamente (Mantine UI / Tailwind CSS)**
+3.  **Estilos CSS não aplicados corretamente (Mantine UI)**
     - **Sintoma**: Os estilos visuais não estão como deveriam.
     - **Solução**:
       - **Conflitos de CSS**: Inspecione os elementos no navegador para ver quais estilos estão sendo aplicados e se há conflitos de especificidade.
       - **Configuração do Mantine**: Verifique se o `MantineProvider` está configurado corretamente na raiz da sua aplicação (geralmente em `src/app/layout.tsx` ou um arquivo similar).
-      - **Classes Tailwind**: Se estiver usando Tailwind CSS diretamente, certifique-se de que as classes estão corretas e que o Tailwind está processando seus arquivos CSS. Verifique o arquivo de configuração `tailwind.config.js`.
       - **Ordem de Importação de CSS**: Em alguns casos, a ordem de importação dos arquivos CSS pode ser importante.
 
 ## Problemas com Build e Deploy

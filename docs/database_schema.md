@@ -2,6 +2,8 @@
 
 Esta seção descreve a estrutura do banco de dados PostgreSQL utilizado pelo VacinaPI, gerenciado através do Supabase.
 
+[Voltar ao Índice](./index.md)
+
 ## Diagrama Entidade-Relacionamento (DER)
 
 (Opcional: Se possível, inclua uma imagem ou representação textual do DER aqui para visualização das relações.)

@@ -13,7 +13,6 @@ Esta documentação visa fornecer uma visão abrangente da arquitetura, funciona
 - **[Esquema do Banco de Dados](./database_schema.md)** - Descrição das tabelas, relacionamentos e o script SQL para criação do banco de dados no Supabase.
 - **[Diretrizes de Contribuição](./contributing.md)** - Como contribuir para o projeto, padrões de codificação e fluxo de trabalho de Pull Request.
 - **[Guia de Componentes](./components_guide.md)** - Documentação sobre os principais componentes reutilizáveis da UI.
-- **[API Endpoints (Backend)](./api_endpoints.md)** - (Se aplicável, para futuras APIs customizadas além do Supabase) Documentação dos endpoints da API.
 - **[Solução de Problemas](./troubleshooting.md)** - Problemas comuns e suas soluções.
 
 Utilize o menu acima para navegar pelas diferentes seções da documentação.
