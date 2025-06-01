@@ -7,6 +7,7 @@ import {
 	Group,
 	Pagination,
 	Paper,
+	Stack,
 	Table,
 	Text,
 	Tooltip,
@@ -88,70 +89,76 @@ export function VaccinesTable({
 	}
 
 	return (
-		<Paper withBorder>
-			<Table highlightOnHover>
-				<Table.Thead>
-					<Table.Tr>
-						<Table.Th>Tipo</Table.Th>
-						<Table.Th>Fabricante</Table.Th>
-						<Table.Th>Data de Criação</Table.Th>
-						<Table.Th w={120}>Ações</Table.Th>
-					</Table.Tr>
-				</Table.Thead>
-				<Table.Tbody>
-					{vaccines.map((vaccine) => (
-						<Table.Tr key={vaccine.id}>
-							<Table.Td>
-								<Text fw={500}>{vaccine.type}</Text>
-							</Table.Td>
-							<Table.Td>
-								<Text>{vaccine.manufacturer}</Text>
-							</Table.Td>
-							<Table.Td>
-								<Text size="sm" c="dimmed">
-									{formatDate(vaccine.created_at)}
-								</Text>
-							</Table.Td>
-							<Table.Td>
-								<Group gap="xs">
-									<Tooltip label="Editar">
-										<ActionIcon
-											variant="subtle"
-											color={CRUD_ACTION_COLORS.edit}
-											size="sm"
-											onClick={() => onEdit(vaccine)}
-										>
-											<FaEdit style={{ width: rem(16), height: rem(16) }} />
-										</ActionIcon>
-									</Tooltip>
-									<Tooltip label="Exportar PDF">
-										<ActionIcon
-											variant="subtle"
-											color={CRUD_ACTION_COLORS.export}
-											size="sm"
-											onClick={() => onExportPdf(vaccine)}
-										>
-											<FaFileDownload
-												style={{ width: rem(16), height: rem(16) }}
-											/>
-										</ActionIcon>
-									</Tooltip>
-									<Tooltip label="Excluir">
-										<ActionIcon
-											variant="subtle"
-											color={CRUD_ACTION_COLORS.delete}
-											size="sm"
-											onClick={() => handleDelete(vaccine)}
-										>
-											<FaTrash style={{ width: rem(16), height: rem(16) }} />
-										</ActionIcon>
-									</Tooltip>
-								</Group>
-							</Table.Td>
-						</Table.Tr>
-					))}
-				</Table.Tbody>
-			</Table>
+		<Stack gap="md">
+			<Paper withBorder>
+				<Table.ScrollContainer minWidth="100%">
+					<Table highlightOnHover>
+						<Table.Thead>
+							<Table.Tr>
+								<Table.Th>Tipo</Table.Th>
+								<Table.Th>Fabricante</Table.Th>
+								<Table.Th>Data de Criação</Table.Th>
+								<Table.Th w={120}>Ações</Table.Th>
+							</Table.Tr>
+						</Table.Thead>
+						<Table.Tbody>
+							{vaccines.map((vaccine) => (
+								<Table.Tr key={vaccine.id}>
+									<Table.Td>
+										<Text fw={500}>{vaccine.type}</Text>
+									</Table.Td>
+									<Table.Td>
+										<Text>{vaccine.manufacturer}</Text>
+									</Table.Td>
+									<Table.Td>
+										<Text size="sm" c="dimmed">
+											{formatDate(vaccine.created_at)}
+										</Text>
+									</Table.Td>
+									<Table.Td>
+										<Group gap="xs">
+											<Tooltip label="Editar">
+												<ActionIcon
+													variant="subtle"
+													color={CRUD_ACTION_COLORS.edit}
+													size="sm"
+													onClick={() => onEdit(vaccine)}
+												>
+													<FaEdit style={{ width: rem(16), height: rem(16) }} />
+												</ActionIcon>
+											</Tooltip>
+											<Tooltip label="Exportar PDF">
+												<ActionIcon
+													variant="subtle"
+													color={CRUD_ACTION_COLORS.export}
+													size="sm"
+													onClick={() => onExportPdf(vaccine)}
+												>
+													<FaFileDownload
+														style={{ width: rem(16), height: rem(16) }}
+													/>
+												</ActionIcon>
+											</Tooltip>
+											<Tooltip label="Excluir">
+												<ActionIcon
+													variant="subtle"
+													color={CRUD_ACTION_COLORS.delete}
+													size="sm"
+													onClick={() => handleDelete(vaccine)}
+												>
+													<FaTrash
+														style={{ width: rem(16), height: rem(16) }}
+													/>
+												</ActionIcon>
+											</Tooltip>
+										</Group>
+									</Table.Td>
+								</Table.Tr>
+							))}
+						</Table.Tbody>
+					</Table>
+				</Table.ScrollContainer>
+			</Paper>
 
 			{totalPages > 1 && (
 				<Group justify="center" p="md">
@@ -163,6 +170,6 @@ export function VaccinesTable({
 					/>
 				</Group>
 			)}
-		</Paper>
+		</Stack>
 	);
 }

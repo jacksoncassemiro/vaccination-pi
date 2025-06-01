@@ -7,6 +7,7 @@ import {
 	Group,
 	Pagination,
 	Paper,
+	Stack,
 	Table,
 	Text,
 	Tooltip,
@@ -88,86 +89,92 @@ export function VaccinationsTable({
 	}
 
 	return (
-		<Paper withBorder>
-			<Table highlightOnHover>
-				<Table.Thead>
-					<Table.Tr>
-						<Table.Th>Paciente</Table.Th>
-						<Table.Th>Vacina</Table.Th>
-						<Table.Th>Data da Dose</Table.Th>
-						<Table.Th>Lote</Table.Th>
-						<Table.Th>Local</Table.Th>
-						<Table.Th w={120}>Ações</Table.Th>
-					</Table.Tr>
-				</Table.Thead>
-				<Table.Tbody>
-					{vaccinations.map((vaccination) => (
-						<Table.Tr key={vaccination.id}>
-							<Table.Td>
-								<div>
-									<Text fw={500}>{vaccination.patient.full_name}</Text>
-									<Text size="sm" c="dimmed">
-										CPF: {vaccination.patient.cpf}
-									</Text>
-								</div>
-							</Table.Td>
-							<Table.Td>
-								<div>
-									<Text fw={500}>{vaccination.vaccine.type}</Text>
-									<Text size="sm" c="dimmed">
-										{vaccination.vaccine.manufacturer}
-									</Text>
-								</div>
-							</Table.Td>
-							<Table.Td>
-								<Text>{formatDate(vaccination.dose_date)}</Text>
-							</Table.Td>
-							<Table.Td>
-								<Text>{vaccination.batch_number}</Text>
-							</Table.Td>
-							<Table.Td>
-								<Text>{vaccination.location}</Text>
-							</Table.Td>
-							<Table.Td>
-								<Group gap="xs">
-									<Tooltip label="Editar">
-										<ActionIcon
-											variant="subtle"
-											color={CRUD_ACTION_COLORS.edit}
-											size="sm"
-											onClick={() => onEdit(vaccination)}
-										>
-											<FaEdit style={{ width: rem(16), height: rem(16) }} />
-										</ActionIcon>
-									</Tooltip>
-									<Tooltip label="Exportar PDF">
-										<ActionIcon
-											variant="subtle"
-											color={CRUD_ACTION_COLORS.export}
-											size="sm"
-											onClick={() => onExportPdf(vaccination)}
-										>
-											<FaFileDownload
-												style={{ width: rem(16), height: rem(16) }}
-											/>
-										</ActionIcon>
-									</Tooltip>
-									<Tooltip label="Excluir">
-										<ActionIcon
-											variant="subtle"
-											color={CRUD_ACTION_COLORS.delete}
-											size="sm"
-											onClick={() => handleDelete(vaccination)}
-										>
-											<FaTrash style={{ width: rem(16), height: rem(16) }} />
-										</ActionIcon>
-									</Tooltip>
-								</Group>
-							</Table.Td>
-						</Table.Tr>
-					))}
-				</Table.Tbody>
-			</Table>
+		<Stack gap="md">
+			<Paper withBorder>
+				<Table.ScrollContainer minWidth="100%">
+					<Table highlightOnHover>
+						<Table.Thead>
+							<Table.Tr>
+								<Table.Th>Paciente</Table.Th>
+								<Table.Th>Vacina</Table.Th>
+								<Table.Th>Data da Dose</Table.Th>
+								<Table.Th>Lote</Table.Th>
+								<Table.Th>Local</Table.Th>
+								<Table.Th w={120}>Ações</Table.Th>
+							</Table.Tr>
+						</Table.Thead>
+						<Table.Tbody>
+							{vaccinations.map((vaccination) => (
+								<Table.Tr key={vaccination.id}>
+									<Table.Td>
+										<div>
+											<Text fw={500}>{vaccination.patient.full_name}</Text>
+											<Text size="sm" c="dimmed">
+												CPF: {vaccination.patient.cpf}
+											</Text>
+										</div>
+									</Table.Td>
+									<Table.Td>
+										<div>
+											<Text fw={500}>{vaccination.vaccine.type}</Text>
+											<Text size="sm" c="dimmed">
+												{vaccination.vaccine.manufacturer}
+											</Text>
+										</div>
+									</Table.Td>
+									<Table.Td>
+										<Text>{formatDate(vaccination.dose_date)}</Text>
+									</Table.Td>
+									<Table.Td>
+										<Text>{vaccination.batch_number}</Text>
+									</Table.Td>
+									<Table.Td>
+										<Text>{vaccination.location}</Text>
+									</Table.Td>
+									<Table.Td>
+										<Group gap="xs">
+											<Tooltip label="Editar">
+												<ActionIcon
+													variant="subtle"
+													color={CRUD_ACTION_COLORS.edit}
+													size="sm"
+													onClick={() => onEdit(vaccination)}
+												>
+													<FaEdit style={{ width: rem(16), height: rem(16) }} />
+												</ActionIcon>
+											</Tooltip>
+											<Tooltip label="Exportar PDF">
+												<ActionIcon
+													variant="subtle"
+													color={CRUD_ACTION_COLORS.export}
+													size="sm"
+													onClick={() => onExportPdf(vaccination)}
+												>
+													<FaFileDownload
+														style={{ width: rem(16), height: rem(16) }}
+													/>
+												</ActionIcon>
+											</Tooltip>
+											<Tooltip label="Excluir">
+												<ActionIcon
+													variant="subtle"
+													color={CRUD_ACTION_COLORS.delete}
+													size="sm"
+													onClick={() => handleDelete(vaccination)}
+												>
+													<FaTrash
+														style={{ width: rem(16), height: rem(16) }}
+													/>
+												</ActionIcon>
+											</Tooltip>
+										</Group>
+									</Table.Td>
+								</Table.Tr>
+							))}
+						</Table.Tbody>
+					</Table>
+				</Table.ScrollContainer>
+			</Paper>
 
 			{totalPages > 1 && (
 				<Group justify="center" p="md">
@@ -179,6 +186,6 @@ export function VaccinationsTable({
 					/>
 				</Group>
 			)}
-		</Paper>
+		</Stack>
 	);
 }

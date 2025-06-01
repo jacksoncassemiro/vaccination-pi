@@ -122,7 +122,7 @@ export function PatientsTable({
 	return (
 		<Stack gap="md">
 			<Paper shadow="xs" withBorder>
-				<Table.ScrollContainer minWidth={800}>
+				<Table.ScrollContainer minWidth="100%">
 					<Table verticalSpacing="sm" horizontalSpacing="md">
 						<Table.Thead>
 							<Table.Tr>
