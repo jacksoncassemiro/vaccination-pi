@@ -9,7 +9,6 @@ export async function signInWithGoogle() {
 
 	const baseUrl = getBaseUrl();
 
-	// Log detalhado para debug
 	console.log("=== DEBUG VARIAVEIS DE AMBIENTE ===");
 	console.log("NODE_ENV:", process.env.NODE_ENV);
 	console.log("VERCEL_URL:", process.env.VERCEL_URL);
