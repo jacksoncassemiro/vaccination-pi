@@ -5,7 +5,7 @@ import { useDebouncedCallback } from "@mantine/hooks";
 import { useEffect, useState } from "react";
 
 interface SearchableSelectProps
-	extends Omit<SelectProps, "onSearchChange" | "searchValue" | "onChange"> {
+	extends Omit<SelectProps, "onSearchChange" | "onChange"> {
 	onSearch: (
 		searchTerm: string
 	) => Promise<Array<{ value: string; label: string }>>;
@@ -24,92 +24,97 @@ export function SearchableSelect({
 	onChange,
 	...selectProps
 }: SearchableSelectProps) {
-	const [options, setOptions] = useState(initialData);
-	const [searchTerm, setSearchTerm] = useState("");
-	const [searching, setSearching] = useState(false); // Efeito para inicializar as opções
+	const [data, setData] = useState(initialData);
+	const [loading, setLoading] = useState(false);
+
+	// Carrega os dados iniciais quando o componente monta ou quando initialData muda
 	useEffect(() => {
-		setOptions(initialData);
+		setData(initialData);
 	}, [initialData]);
 
-	// Efeito separado para garantir que o valor selecionado esteja visível
+	// Garantir que o valor selecionado esteja sempre nos dados
 	useEffect(() => {
-		if (value) {
-			setOptions((currentOptions) => {
-				// Verificar se o valor já existe nas opções atuais
-				const valueExists = currentOptions.some(
-					(option) => option.value === value
-				);
-
-				if (!valueExists) {
-					// Procurar nos dados iniciais primeiro
-					const itemInInitial = initialData.find(
-						(option) => option.value === value
-					);
-
-					if (itemInInitial) {
-						// Se encontrou nos dados iniciais, retornar os dados iniciais
-						return initialData;
-					} else {
-						// Se não encontrou, criar um item temporário
-						const selectedItem = { value, label: value };
-						return [selectedItem, ...initialData];
+		if (value && !data.find((item) => item.value === value)) {
+			// Se o valor existe mas não está nos dados atuais, adicionar os dados iniciais
+			if (initialData.find((item) => item.value === value)) {
+				setData((prev) => {
+					const exists = prev.find((item) => item.value === value);
+					if (!exists) {
+						return [
+							...initialData,
+							...prev.filter(
+								(item) =>
+									!initialData.find((initial) => initial.value === item.value)
+							),
+						];
 					}
-				}
-
-				return currentOptions;
-			});
+					return prev;
+				});
+			}
 		}
-	}, [value, initialData]);
+	}, [value, data, initialData]);
 
-	// Callback de busca com debounce
+	// Função de busca com debounce
 	const debouncedSearch = useDebouncedCallback(async (term: string) => {
 		if (!term.trim()) {
+			// Se não há termo de busca, retorna aos dados iniciais
+			setData(initialData);
+			setLoading(false);
 			return;
 		}
 
-		setSearching(true);
+		setLoading(true);
 		try {
 			const results = await onSearch(term);
-			setOptions(results);
+			// Garantir que o valor atual sempre esteja presente nos resultados
+			if (value) {
+				const currentItem =
+					data.find((item) => item.value === value) ||
+					initialData.find((item) => item.value === value);
+				if (currentItem && !results.find((item) => item.value === value)) {
+					results.unshift(currentItem);
+				}
+			}
+			setData(results);
 		} catch (error) {
 			console.error("Erro ao buscar dados:", error);
+			setData(initialData); // Em caso de erro, volta aos dados iniciais
 		} finally {
-			setSearching(false);
+			setLoading(false);
 		}
-	}, debounceMs); // Handler para mudanças de busca
-	const handleSearchChange = (term: string) => {
-		setSearchTerm(term);
+	}, debounceMs);
 
-		// Se o campo foi limpo (onBlur), não fazer nada
-		// As opções já estão corretas pelo useEffect que gerencia o valor selecionado
-		if (!term.trim()) {
-			return;
-		}
+	// Handler para mudanças no valor de busca - SEM estado controlado
+	const handleSearchChange = (searchValue: string) => {
+		debouncedSearch(searchValue);
+	};
 
-		// Fazer a busca apenas se há termo de busca
-		debouncedSearch(term);
-	}; // Handler personalizado para mudanças de valor
-	const handleValueChange = (newValue: string | null) => {
-		// Limpar o termo de busca sempre que o valor muda
-		setSearchTerm("");
-
-		// O useEffect já cuida de garantir que o valor esteja nas opções
+	// Handler para mudanças no valor selecionado
+	const handleChange = (newValue: string | null) => {
 		if (onChange) {
 			onChange(newValue);
+		}
+	};
+
+	// Handler quando o dropdown é aberto
+	const handleDropdownOpen = () => {
+		// Se não há dados ou apenas dados iniciais, garante que os dados iniciais estejam carregados
+		if (data.length === 0 || data === initialData) {
+			setData(initialData);
 		}
 	};
 
 	return (
 		<Select
 			{...selectProps}
+			data={data}
 			value={value}
-			onChange={handleValueChange}
-			data={options}
+			onChange={handleChange}
 			searchable
-			searchValue={searchTerm}
 			onSearchChange={handleSearchChange}
-			nothingFoundMessage={searching ? "Pesquisando..." : noResultsMessage}
-			rightSection={searching ? <Loader size="xs" /> : undefined}
+			onDropdownOpen={handleDropdownOpen}
+			nothingFoundMessage={loading ? "Pesquisando..." : noResultsMessage}
+			rightSection={loading ? <Loader size="xs" /> : undefined}
 			clearable
 			allowDeselect
 		/>

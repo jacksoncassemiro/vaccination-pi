@@ -190,6 +190,7 @@ export function DashboardFilters({
 						initialData={initialVaccines}
 						clearable
 					/>
+
 					<SearchableSelect
 						label="Paciente"
 						placeholder="Buscar paciente..."
