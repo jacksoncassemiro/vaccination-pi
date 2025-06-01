@@ -25,7 +25,6 @@
 			"@/constants/*": ["./src/constants/*"],
 			"@/contexts/*": ["./src/contexts/*"],
 			"@/hooks/*": ["./src/hooks/*"],
-			"@/queries/*": ["./src/hooks/queries/*"],
 			"@/schemas/*": ["./src/schemas/*"],
 			"@/services/*": ["./src/services/*"],
 			"@/styles/*": ["./src/styles/*"],
