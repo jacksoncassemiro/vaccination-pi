@@ -17,14 +17,6 @@ export async function GET(request: Request) {
 			const isLocalEnv = process.env.NODE_ENV === "development";
 			const isLocalhost = origin.includes("localhost");
 
-			console.log("Redirecionando após login bem-sucedido:", {
-				origin,
-				forwardedHost,
-				isLocalEnv,
-				isLocalhost,
-				next,
-			});
-
 			if (isLocalhost || isLocalEnv) {
 				// Forçar HTTP para localhost (desenvolvimento ou produção local)
 				let redirectUrl = origin;
@@ -34,12 +26,6 @@ export async function GET(request: Request) {
 
 				return NextResponse.redirect(`${redirectUrl}${next}`);
 			} else if (forwardedHost) {
-				console.log(
-					"Redirecionando para o host original:",
-					forwardedHost,
-					"next:",
-					next
-				);
 				return NextResponse.redirect(`https://${forwardedHost}${next}`);
 			} else {
 				return NextResponse.redirect(`${origin}${next}`);
