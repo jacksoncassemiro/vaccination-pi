@@ -1,5 +1,6 @@
 "use client";
 
+import { useDebouncedCallback } from "@mantine/hooks";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, useTransition } from "react";
 
@@ -35,18 +36,25 @@ export function useCrudPage<T extends { id: string }>({
 	errorMessage,
 }: CrudPageConfig<T>) {
 	const [search, setSearch] = useState("");
+	const [debouncedSearch, setDebouncedSearch] = useState("");
 	const [currentPage, setCurrentPage] = useState(1);
 	const [data, setData] = useState(initialData);
 	const [isPending, startTransition] = useTransition();
 	const [error, setError] = useState<string | null>(null);
 	const router = useRouter();
 
-	// Efeito para buscar dados quando search ou página mudam
+	// Debounce para a busca
+	const debouncedSetSearch = useDebouncedCallback((value: string) => {
+		setDebouncedSearch(value);
+		setCurrentPage(1); // Reset para primeira página ao buscar
+	}, 300);
+
+	// Efeito para buscar dados quando debouncedSearch ou página mudam
 	useEffect(() => {
 		startTransition(async () => {
 			try {
 				const response = await fetchData({
-					search,
+					search: debouncedSearch,
 					page: currentPage,
 					limit: 10,
 				});
@@ -56,7 +64,7 @@ export function useCrudPage<T extends { id: string }>({
 				setError(errorMessage);
 			}
 		});
-	}, [search, currentPage, fetchData, errorMessage]);
+	}, [debouncedSearch, currentPage, fetchData, errorMessage]);
 
 	// Handler para adicionar novo item
 	const handleAdd = () => {
@@ -74,10 +82,9 @@ export function useCrudPage<T extends { id: string }>({
 			if (!result.success) {
 				setError("Erro ao excluir item. Tente novamente.");
 				return;
-			}
-			// Recarregar dados após exclusão
+			} // Recarregar dados após exclusão
 			const response = await fetchData({
-				search,
+				search: debouncedSearch,
 				page: currentPage,
 				limit: 10,
 			});
@@ -91,11 +98,10 @@ export function useCrudPage<T extends { id: string }>({
 	const handlePageChange = (page: number) => {
 		setCurrentPage(page);
 	};
-
 	// Handler para mudança de busca
 	const handleSearchChange = (searchTerm: string) => {
-		setSearch(searchTerm);
-		setCurrentPage(1); // Reset para primeira página ao buscar
+		setSearch(searchTerm); // Atualiza imediatamente o valor visual
+		debouncedSetSearch(searchTerm); // Aplica o debounce para a busca real
 	};
 
 	return {
