@@ -23,14 +23,15 @@ export function BaseAppShell({
 	withNavbar = false,
 	mobileOpened = false,
 }: BaseAppShellProps) {
-	return (		<AppShell
+	return (
+		<AppShell
 			header={{ height: 60 }}
 			navbar={
 				withNavbar && navbar
 					? {
 							width: 300,
 							breakpoint: "sm",
-							collapsed: { mobile: !mobileOpened },
+							collapsed: { desktop: true, mobile: !mobileOpened },
 					  }
 					: undefined
 			}
