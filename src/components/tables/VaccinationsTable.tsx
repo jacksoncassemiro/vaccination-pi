@@ -2,6 +2,7 @@
 
 import { CRUD_ACTION_COLORS } from "@/constants";
 import type { VaccinationRecordWithDetails } from "@/types/vaccinations";
+import { formatDateToBrazilian } from "@/utils/formatters";
 import {
 	ActionIcon,
 	Group,
@@ -26,10 +27,6 @@ interface VaccinationsTableProps {
 	onEdit: (vaccination: VaccinationRecordWithDetails) => void;
 	onDelete: (id: string) => void;
 	onExportPdf: (vaccination: VaccinationRecordWithDetails) => void;
-}
-
-function formatDate(dateString: string): string {
-	return new Date(dateString).toLocaleDateString("pt-BR");
 }
 
 export function VaccinationsTable({
@@ -123,7 +120,7 @@ export function VaccinationsTable({
 										</div>
 									</Table.Td>
 									<Table.Td>
-										<Text>{formatDate(vaccination.dose_date)}</Text>
+										<Text>{formatDateToBrazilian(vaccination.dose_date)}</Text>
 									</Table.Td>
 									<Table.Td>
 										<Text>{vaccination.batch_number}</Text>

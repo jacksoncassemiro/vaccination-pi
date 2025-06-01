@@ -52,3 +52,11 @@ export function parseDateFromString(dateString: string): Date {
 
 	return parsed.toDate();
 }
+
+/**
+ * Formata uma string de data para o formato brasileiro DD/MM/YYYY
+ * Evita problemas de conversão UTC que podem alterar o dia
+ */
+export function formatDateToBrazilian(dateString: string): string {
+	return dayjs(dateString).format("DD/MM/YYYY");
+}

@@ -5,6 +5,7 @@ import type {
 	VaccinationsResponse,
 	VaccinationsSearchFilters,
 } from "@/types/vaccinations";
+import { parseDateFromString } from "@/utils/formatters";
 import { createClient } from "@/utils/supabase/server";
 import { revalidatePath } from "next/cache";
 
@@ -513,7 +514,7 @@ export async function getVaccinationsByMonth() {
 		throw new Error(`Erro ao buscar vacinações por mês: ${error.message}`);
 	} // Agrupar por mês
 	const grouped = (data || []).reduce((acc, record: DatabaseRow) => {
-		const date = new Date(record.dose_date as string);
+		const date = parseDateFromString(record.dose_date as string);
 		const monthKey = `${date.getFullYear()}-${String(
 			date.getMonth() + 1
 		).padStart(2, "0")}`;
@@ -570,7 +571,9 @@ export async function getPatientsByAgeGroup() {
 		"60+": 0,
 	};
 	(data || []).forEach((patient: DatabaseRow) => {
-		const birthYear = new Date(patient.birth_date as string).getFullYear();
+		const birthYear = parseDateFromString(
+			patient.birth_date as string
+		).getFullYear();
 		const age = currentYear - birthYear;
 
 		if (age <= 17) ageGroups["0-17"]++;
@@ -981,9 +984,8 @@ export async function getWeeklyTrends() {
 
 	// Agrupar por semana
 	const weeklyData: Record<string, number> = {};
-
 	(data || []).forEach((record: DatabaseRow) => {
-		const date = new Date(record.dose_date as string);
+		const date = parseDateFromString(record.dose_date as string);
 		const weekStart = new Date(date);
 		weekStart.setDate(date.getDate() - date.getDay());
 		const weekKey = weekStart.toISOString().split("T")[0];
@@ -1175,7 +1177,7 @@ export async function getDashboardDataWithFilters(
 		filteredVaccinations = filteredVaccinations.filter(
 			(vaccination: DatabaseRow) => {
 				const patient = vaccination.patient as { birth_date: string };
-				const birthYear = new Date(patient.birth_date).getFullYear();
+				const birthYear = parseDateFromString(patient.birth_date).getFullYear();
 				const age = currentYear - birthYear;
 
 				switch (ageGroup) {

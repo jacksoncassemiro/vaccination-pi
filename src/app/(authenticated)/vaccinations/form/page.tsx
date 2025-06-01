@@ -95,7 +95,7 @@ export default function VaccinationFormPage() {
 				const doseDate =
 					values.dose_date instanceof Date
 						? values.dose_date
-						: new Date(values.dose_date);
+						: parseDateFromString(values.dose_date);
 
 				formData.append("dose_date", formatDateForForm(doseDate));
 				formData.append("batch_number", values.batch_number);

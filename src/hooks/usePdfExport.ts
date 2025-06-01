@@ -1,6 +1,13 @@
+import {
+	PDF_COLUMN_WIDTHS,
+	PDF_CONFIG,
+	PDF_TABLE_HEADERS,
+	PDF_TEXTS,
+} from "@/constants";
 import type { Patient } from "@/types/patients";
 import type { VaccinationRecordWithDetails } from "@/types/vaccinations";
 import type { Vaccine } from "@/types/vaccines";
+import { formatDateToBrazilian } from "@/utils/formatters";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
 import { useCallback } from "react";
@@ -51,93 +58,87 @@ export function usePdfExport() {
 				title = "Lista de Pacientes",
 				includeHeader = true,
 				includeFooter = true,
-				orientation = "landscape",
+				orientation = PDF_CONFIG.DEFAULT_ORIENTATION,
 			} = options;
 
 			// Criar documento PDF
 			const doc = new jsPDF({
 				orientation,
-				unit: "mm",
-				format: "a4",
+				unit: PDF_CONFIG.DEFAULT_UNIT,
+				format: PDF_CONFIG.DEFAULT_FORMAT,
 			});
 
 			// Configurações de fonte
-			doc.setFont("helvetica");
-
-			let currentY = 20;
+			doc.setFont(PDF_CONFIG.FONT_FAMILY);
+			let currentY = PDF_CONFIG.MARGINS.TOP;
 
 			// Cabeçalho
 			if (includeHeader) {
-				doc.setFontSize(20);
-				doc.setFont("helvetica", "bold");
-				doc.text(title, 14, currentY);
+				doc.setFontSize(PDF_CONFIG.FONT_SIZES.TITLE);
+				doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.BOLD);
+				doc.text(title, PDF_CONFIG.MARGINS.LEFT, currentY);
 				currentY += 10;
 
-				doc.setFontSize(12);
-				doc.setFont("helvetica", "normal");
+				doc.setFontSize(PDF_CONFIG.FONT_SIZES.NORMAL);
+				doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.NORMAL);
 				doc.text(
-					`Gerado em: ${new Date().toLocaleDateString(
+					`${PDF_TEXTS.GENERATED_AT} ${new Date().toLocaleDateString(
 						"pt-BR"
-					)} às ${new Date().toLocaleTimeString("pt-BR")}`,
-					14,
+					)} ${PDF_TEXTS.AT_TIME} ${new Date().toLocaleTimeString("pt-BR")}`,
+					PDF_CONFIG.MARGINS.LEFT,
 					currentY
 				);
 				currentY += 10;
 
-				doc.text(`Total de pacientes: ${patients.length}`, 14, currentY);
+				doc.text(
+					`${PDF_TEXTS.TOTAL_PATIENTS} ${patients.length}`,
+					PDF_CONFIG.MARGINS.LEFT,
+					currentY
+				);
 				currentY += 15;
-			}
-
-			// Preparar dados para a tabela
+			} // Preparar dados para a tabela
 			const tableData = patients.map((patient) => [
 				patient.full_name,
 				patient.cpf,
-				new Date(patient.birth_date).toLocaleDateString("pt-BR"),
+				formatDateToBrazilian(patient.birth_date),
 				patient.phone,
 				`${patient.street}, ${patient.number}${
 					patient.complement ? `, ${patient.complement}` : ""
 				}`,
 				`${patient.neighborhood} - ${patient.city}/${patient.state}`,
 				patient.cep,
-			]);
-
-			// Criar tabela
+			]); // Criar tabela
 			autoTable(doc, {
-				head: [
-					[
-						"Nome Completo",
-						"CPF",
-						"Data de Nascimento",
-						"Telefone",
-						"Endereço",
-						"Bairro/Cidade",
-						"CEP",
-					],
-				],
+				head: [PDF_TABLE_HEADERS.PATIENTS],
 				body: tableData,
 				startY: currentY,
 				styles: {
-					fontSize: 8,
-					cellPadding: 3,
+					fontSize: PDF_CONFIG.FONT_SIZES.TINY,
+					cellPadding: PDF_CONFIG.TABLE.CELL_PADDING,
 				},
 				headStyles: {
-					fillColor: [79, 70, 229], // Cor azul do tema
-					textColor: 255,
-					fontStyle: "bold",
+					fillColor: PDF_CONFIG.COLORS.PRIMARY,
+					textColor: PDF_CONFIG.COLORS.WHITE,
+					fontStyle: PDF_CONFIG.FONT_STYLES.BOLD,
 				},
 				alternateRowStyles: {
-					fillColor: [245, 245, 245],
+					fillColor: PDF_CONFIG.COLORS.ALTERNATE_ROW,
 				},
 				columnStyles: {
-					0: { cellWidth: 40 }, // Nome
-					1: { cellWidth: 25 }, // CPF
-					2: { cellWidth: 25 }, // Data
-					3: { cellWidth: 25 }, // Telefone
-					4: { cellWidth: 45 }, // Endereço
-					5: { cellWidth: 40 }, // Bairro/Cidade
-					6: { cellWidth: 20 }, // CEP
+					0: { cellWidth: PDF_COLUMN_WIDTHS.PATIENTS.NAME },
+					1: { cellWidth: PDF_COLUMN_WIDTHS.PATIENTS.CPF },
+					2: { cellWidth: PDF_COLUMN_WIDTHS.PATIENTS.BIRTH_DATE },
+					3: { cellWidth: PDF_COLUMN_WIDTHS.PATIENTS.PHONE },
+					4: { cellWidth: PDF_COLUMN_WIDTHS.PATIENTS.ADDRESS },
+					5: { cellWidth: PDF_COLUMN_WIDTHS.PATIENTS.NEIGHBORHOOD_CITY },
+					6: { cellWidth: PDF_COLUMN_WIDTHS.PATIENTS.CEP },
 				},
-				margin: { top: 20, right: 14, bottom: 20, left: 14 },
+				margin: {
+					top: PDF_CONFIG.MARGINS.TOP,
+					right: PDF_CONFIG.MARGINS.RIGHT,
+					bottom: PDF_CONFIG.MARGINS.BOTTOM,
+					left: PDF_CONFIG.MARGINS.LEFT,
+				},
 			});
 
 			// Rodapé
@@ -166,59 +167,55 @@ export function usePdfExport() {
 		},
 		[]
 	);
-
 	const exportPatientToPdf = useCallback((patient: Patient) => {
 		const doc = new jsPDF({
 			orientation: "portrait",
-			unit: "mm",
-			format: "a4",
+			unit: PDF_CONFIG.DEFAULT_UNIT,
+			format: PDF_CONFIG.DEFAULT_FORMAT,
 		});
 
-		doc.setFont("helvetica");
-		let currentY = 20;
+		doc.setFont(PDF_CONFIG.FONT_FAMILY);
+		let currentY = PDF_CONFIG.MARGINS.TOP;
 
 		// Título
-		doc.setFontSize(20);
-		doc.setFont("helvetica", "bold");
-		doc.text("Ficha do Paciente", 14, currentY);
+		doc.setFontSize(PDF_CONFIG.FONT_SIZES.TITLE);
+		doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.BOLD);
+		doc.text("Ficha do Paciente", PDF_CONFIG.MARGINS.LEFT, currentY);
 		currentY += 15;
 
 		// Informações do paciente
-		doc.setFontSize(12);
-		doc.setFont("helvetica", "normal");
+		doc.setFontSize(PDF_CONFIG.FONT_SIZES.NORMAL);
+		doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.NORMAL);
 
 		const info = [
 			["Nome Completo:", patient.full_name],
 			["CPF:", patient.cpf],
-			[
-				"Data de Nascimento:",
-				new Date(patient.birth_date).toLocaleDateString("pt-BR"),
-			],
+			["Data de Nascimento:", formatDateToBrazilian(patient.birth_date)],
 			["Telefone:", patient.phone],
 			["CEP:", patient.cep],
 			["Endereço:", `${patient.street}, ${patient.number}`],
-			["Complemento:", patient.complement || "N/A"],
+			["Complemento:", patient.complement || PDF_TEXTS.NOT_APPLICABLE],
 			["Bairro:", patient.neighborhood],
 			["Cidade:", patient.city],
 			["Estado:", patient.state],
 		];
 
 		info.forEach(([label, value]) => {
-			doc.setFont("helvetica", "bold");
-			doc.text(label, 14, currentY);
-			doc.setFont("helvetica", "normal");
+			doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.BOLD);
+			doc.text(label, PDF_CONFIG.MARGINS.LEFT, currentY);
+			doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.NORMAL);
 			doc.text(value, 60, currentY);
 			currentY += 8;
 		});
 
 		// Data de geração
 		currentY += 10;
-		doc.setFontSize(10);
+		doc.setFontSize(PDF_CONFIG.FONT_SIZES.SMALL);
 		doc.text(
-			`Gerado em: ${new Date().toLocaleDateString(
-				"pt-BR"
-			)} às ${new Date().toLocaleTimeString("pt-BR")}`,
-			14,
+			`${PDF_TEXTS.GENERATED_AT} ${new Date().toLocaleDateString("pt-BR")} ${
+				PDF_TEXTS.AT_TIME
+			} ${new Date().toLocaleTimeString("pt-BR")}`,
+			PDF_CONFIG.MARGINS.LEFT,
 			currentY
 		);
 
@@ -228,47 +225,50 @@ export function usePdfExport() {
 		}.pdf`;
 		doc.save(fileName);
 	}, []);
-
 	const exportVaccinesToPdf = useCallback(
 		(vaccines: Vaccine[], options: PdfExportOptions = {}) => {
 			const {
 				title = "Catálogo de Vacinas",
 				includeHeader = true,
 				includeFooter = true,
-				orientation = "landscape",
+				orientation = PDF_CONFIG.DEFAULT_ORIENTATION,
 			} = options;
 
 			// Criar documento PDF
 			const doc = new jsPDF({
 				orientation,
-				unit: "mm",
-				format: "a4",
+				unit: PDF_CONFIG.DEFAULT_UNIT,
+				format: PDF_CONFIG.DEFAULT_FORMAT,
 			});
 
 			// Configurações de fonte
-			doc.setFont("helvetica");
+			doc.setFont(PDF_CONFIG.FONT_FAMILY);
 
-			let currentY = 20;
+			let currentY = PDF_CONFIG.MARGINS.TOP;
 
 			// Cabeçalho
 			if (includeHeader) {
-				doc.setFontSize(20);
-				doc.setFont("helvetica", "bold");
-				doc.text(title, 14, currentY);
+				doc.setFontSize(PDF_CONFIG.FONT_SIZES.TITLE);
+				doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.BOLD);
+				doc.text(title, PDF_CONFIG.MARGINS.LEFT, currentY);
 				currentY += 10;
 
-				doc.setFontSize(12);
-				doc.setFont("helvetica", "normal");
+				doc.setFontSize(PDF_CONFIG.FONT_SIZES.NORMAL);
+				doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.NORMAL);
 				doc.text(
-					`Gerado em: ${new Date().toLocaleDateString(
+					`${PDF_TEXTS.GENERATED_AT} ${new Date().toLocaleDateString(
 						"pt-BR"
-					)} às ${new Date().toLocaleTimeString("pt-BR")}`,
-					14,
+					)} ${PDF_TEXTS.AT_TIME} ${new Date().toLocaleTimeString("pt-BR")}`,
+					PDF_CONFIG.MARGINS.LEFT,
 					currentY
 				);
 				currentY += 10;
 
-				doc.text(`Total de vacinas: ${vaccines.length}`, 14, currentY);
+				doc.text(
+					`${PDF_TEXTS.TOTAL_VACCINES} ${vaccines.length}`,
+					PDF_CONFIG.MARGINS.LEFT,
+					currentY
+				);
 				currentY += 15;
 			}
 
@@ -276,41 +276,39 @@ export function usePdfExport() {
 			const tableData = vaccines.map((vaccine) => [
 				vaccine.type,
 				vaccine.manufacturer,
-				new Date(vaccine.created_at).toLocaleDateString("pt-BR"),
-				new Date(vaccine.updated_at).toLocaleDateString("pt-BR"),
+				formatDateToBrazilian(vaccine.created_at),
+				formatDateToBrazilian(vaccine.updated_at),
 			]);
 
 			// Criar tabela
 			autoTable(doc, {
-				head: [
-					[
-						"Tipo da Vacina",
-						"Fabricante",
-						"Data de Criação",
-						"Última Atualização",
-					],
-				],
+				head: [PDF_TABLE_HEADERS.VACCINES],
 				body: tableData,
 				startY: currentY,
 				styles: {
-					fontSize: 10,
-					cellPadding: 4,
+					fontSize: PDF_CONFIG.FONT_SIZES.SMALL,
+					cellPadding: PDF_CONFIG.TABLE.HEAD_CELL_PADDING,
 				},
 				headStyles: {
-					fillColor: [79, 70, 229], // Cor azul do tema
-					textColor: 255,
-					fontStyle: "bold",
+					fillColor: PDF_CONFIG.COLORS.PRIMARY,
+					textColor: PDF_CONFIG.COLORS.WHITE,
+					fontStyle: PDF_CONFIG.FONT_STYLES.BOLD,
 				},
 				alternateRowStyles: {
-					fillColor: [245, 245, 245],
+					fillColor: PDF_CONFIG.COLORS.ALTERNATE_ROW,
 				},
 				columnStyles: {
-					0: { cellWidth: 80 }, // Tipo
-					1: { cellWidth: 80 }, // Fabricante
-					2: { cellWidth: 40 }, // Data de Criação
-					3: { cellWidth: 40 }, // Última Atualização
+					0: { cellWidth: PDF_COLUMN_WIDTHS.VACCINES.TYPE },
+					1: { cellWidth: PDF_COLUMN_WIDTHS.VACCINES.MANUFACTURER },
+					2: { cellWidth: PDF_COLUMN_WIDTHS.VACCINES.CREATED_AT },
+					3: { cellWidth: PDF_COLUMN_WIDTHS.VACCINES.UPDATED_AT },
 				},
-				margin: { top: 20, right: 14, bottom: 20, left: 14 },
+				margin: {
+					top: PDF_CONFIG.MARGINS.TOP,
+					right: PDF_CONFIG.MARGINS.RIGHT,
+					bottom: PDF_CONFIG.MARGINS.BOTTOM,
+					left: PDF_CONFIG.MARGINS.LEFT,
+				},
 			});
 
 			// Rodapé
@@ -319,12 +317,16 @@ export function usePdfExport() {
 				for (let i = 1; i <= pageCount; i++) {
 					doc.setPage(i);
 					const pageHeight = doc.internal.pageSize.height;
-					doc.setFontSize(10);
-					doc.setFont("helvetica", "normal");
-					doc.text(`Página ${i} de ${pageCount}`, 14, pageHeight - 10);
+					doc.setFontSize(PDF_CONFIG.FONT_SIZES.SMALL);
+					doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.NORMAL);
 					doc.text(
-						"Sistema de Vacinação",
-						doc.internal.pageSize.width - 14,
+						`${PDF_TEXTS.PAGE} ${i} ${PDF_TEXTS.OF} ${pageCount}`,
+						PDF_CONFIG.MARGINS.LEFT,
+						pageHeight - 10
+					);
+					doc.text(
+						PDF_TEXTS.SYSTEM_NAME,
+						doc.internal.pageSize.width - PDF_CONFIG.MARGINS.RIGHT,
 						pageHeight - 10,
 						{ align: "right" }
 					);
@@ -337,66 +339,59 @@ export function usePdfExport() {
 		},
 		[]
 	);
-
 	const exportVaccineToPdf = useCallback((vaccine: Vaccine) => {
 		const doc = new jsPDF({
 			orientation: "portrait",
-			unit: "mm",
-			format: "a4",
+			unit: PDF_CONFIG.DEFAULT_UNIT,
+			format: PDF_CONFIG.DEFAULT_FORMAT,
 		});
 
-		doc.setFont("helvetica");
-		let currentY = 20;
+		doc.setFont(PDF_CONFIG.FONT_FAMILY);
+		let currentY = PDF_CONFIG.MARGINS.TOP;
 
 		// Título
-		doc.setFontSize(20);
-		doc.setFont("helvetica", "bold");
-		doc.text("Ficha da Vacina", 14, currentY);
+		doc.setFontSize(PDF_CONFIG.FONT_SIZES.TITLE);
+		doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.BOLD);
+		doc.text("Ficha da Vacina", PDF_CONFIG.MARGINS.LEFT, currentY);
 		currentY += 15;
 
 		// Informações da vacina
-		doc.setFontSize(12);
-		doc.setFont("helvetica", "normal");
+		doc.setFontSize(PDF_CONFIG.FONT_SIZES.NORMAL);
+		doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.NORMAL);
 
 		const info = [
 			["Tipo da Vacina:", vaccine.type],
 			["Fabricante:", vaccine.manufacturer],
-			[
-				"Data de Criação:",
-				new Date(vaccine.created_at).toLocaleDateString("pt-BR"),
-			],
-			[
-				"Última Atualização:",
-				new Date(vaccine.updated_at).toLocaleDateString("pt-BR"),
-			],
+			["Data de Criação:", formatDateToBrazilian(vaccine.created_at)],
+			["Última Atualização:", formatDateToBrazilian(vaccine.updated_at)],
 			["ID do Sistema:", vaccine.id],
 		];
 
 		info.forEach(([label, value]) => {
-			doc.setFont("helvetica", "bold");
-			doc.text(label, 14, currentY);
-			doc.setFont("helvetica", "normal");
+			doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.BOLD);
+			doc.text(label, PDF_CONFIG.MARGINS.LEFT, currentY);
+			doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.NORMAL);
 			doc.text(value, 60, currentY);
 			currentY += 8;
 		});
 
 		// Data de geração
 		currentY += 10;
-		doc.setFontSize(10);
+		doc.setFontSize(PDF_CONFIG.FONT_SIZES.SMALL);
 		doc.text(
-			`Gerado em: ${new Date().toLocaleDateString(
-				"pt-BR"
-			)} às ${new Date().toLocaleTimeString("pt-BR")}`,
-			14,
+			`${PDF_TEXTS.GENERATED_AT} ${new Date().toLocaleDateString("pt-BR")} ${
+				PDF_TEXTS.AT_TIME
+			} ${new Date().toLocaleTimeString("pt-BR")}`,
+			PDF_CONFIG.MARGINS.LEFT,
 			currentY
 		);
+
 		// Salvar
 		const fileName = `vacina_${vaccine.type.replace(/\s+/g, "_")}_${
 			new Date().toISOString().split("T")[0]
 		}.pdf`;
 		doc.save(fileName);
 	}, []);
-
 	const exportVaccinationsToPdf = useCallback(
 		(
 			vaccinations: VaccinationRecordWithDetails[],
@@ -406,40 +401,44 @@ export function usePdfExport() {
 				title = "Registro de Vacinações",
 				includeHeader = true,
 				includeFooter = true,
-				orientation = "landscape",
+				orientation = PDF_CONFIG.DEFAULT_ORIENTATION,
 			} = options;
 
 			// Criar documento PDF
 			const doc = new jsPDF({
 				orientation,
-				unit: "mm",
-				format: "a4",
+				unit: PDF_CONFIG.DEFAULT_UNIT,
+				format: PDF_CONFIG.DEFAULT_FORMAT,
 			});
 
 			// Configurações de fonte
-			doc.setFont("helvetica");
+			doc.setFont(PDF_CONFIG.FONT_FAMILY);
 
-			let currentY = 20;
+			let currentY = PDF_CONFIG.MARGINS.TOP;
 
 			// Cabeçalho
 			if (includeHeader) {
-				doc.setFontSize(20);
-				doc.setFont("helvetica", "bold");
-				doc.text(title, 14, currentY);
+				doc.setFontSize(PDF_CONFIG.FONT_SIZES.TITLE);
+				doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.BOLD);
+				doc.text(title, PDF_CONFIG.MARGINS.LEFT, currentY);
 				currentY += 10;
 
-				doc.setFontSize(12);
-				doc.setFont("helvetica", "normal");
+				doc.setFontSize(PDF_CONFIG.FONT_SIZES.NORMAL);
+				doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.NORMAL);
 				doc.text(
-					`Gerado em: ${new Date().toLocaleDateString(
+					`${PDF_TEXTS.GENERATED_AT} ${new Date().toLocaleDateString(
 						"pt-BR"
-					)} às ${new Date().toLocaleTimeString("pt-BR")}`,
-					14,
+					)} ${PDF_TEXTS.AT_TIME} ${new Date().toLocaleTimeString("pt-BR")}`,
+					PDF_CONFIG.MARGINS.LEFT,
 					currentY
 				);
 				currentY += 10;
 
-				doc.text(`Total de vacinações: ${vaccinations.length}`, 14, currentY);
+				doc.text(
+					`${PDF_TEXTS.TOTAL_VACCINATIONS} ${vaccinations.length}`,
+					PDF_CONFIG.MARGINS.LEFT,
+					currentY
+				);
 				currentY += 15;
 			}
 
@@ -449,51 +448,45 @@ export function usePdfExport() {
 				vaccination.patient.cpf,
 				vaccination.vaccine.type,
 				vaccination.vaccine.manufacturer,
-				new Date(vaccination.dose_date).toLocaleDateString("pt-BR"),
+				formatDateToBrazilian(vaccination.dose_date),
 				vaccination.batch_number,
 				vaccination.location,
-				vaccination.notes || "-",
+				vaccination.notes || PDF_TEXTS.DASH,
 			]);
 
 			// Criar tabela
 			autoTable(doc, {
-				head: [
-					[
-						"Paciente",
-						"CPF",
-						"Vacina",
-						"Fabricante",
-						"Data da Dose",
-						"Lote",
-						"Local",
-						"Observações",
-					],
-				],
+				head: [PDF_TABLE_HEADERS.VACCINATIONS],
 				body: tableData,
 				startY: currentY,
 				styles: {
-					fontSize: 8,
-					cellPadding: 2,
+					fontSize: PDF_CONFIG.FONT_SIZES.TINY,
+					cellPadding: PDF_CONFIG.TABLE.ALTERNATE_ROW_PADDING,
 				},
 				headStyles: {
-					fillColor: [79, 70, 229], // Cor azul do tema
-					textColor: 255,
-					fontStyle: "bold",
+					fillColor: PDF_CONFIG.COLORS.PRIMARY,
+					textColor: PDF_CONFIG.COLORS.WHITE,
+					fontStyle: PDF_CONFIG.FONT_STYLES.BOLD,
 				},
 				alternateRowStyles: {
-					fillColor: [245, 245, 245],
+					fillColor: PDF_CONFIG.COLORS.ALTERNATE_ROW,
 				},
 				columnStyles: {
-					0: { cellWidth: 35 }, // Paciente
-					1: { cellWidth: 25 }, // CPF
-					2: { cellWidth: 30 }, // Vacina
-					3: { cellWidth: 25 }, // Fabricante
-					4: { cellWidth: 20 }, // Data
-					5: { cellWidth: 20 }, // Lote
-					6: { cellWidth: 30 }, // Local
-					7: { cellWidth: 30 }, // Observações
+					0: { cellWidth: PDF_COLUMN_WIDTHS.VACCINATIONS.PATIENT },
+					1: { cellWidth: PDF_COLUMN_WIDTHS.VACCINATIONS.CPF },
+					2: { cellWidth: PDF_COLUMN_WIDTHS.VACCINATIONS.VACCINE },
+					3: { cellWidth: PDF_COLUMN_WIDTHS.VACCINATIONS.MANUFACTURER },
+					4: { cellWidth: PDF_COLUMN_WIDTHS.VACCINATIONS.DOSE_DATE },
+					5: { cellWidth: PDF_COLUMN_WIDTHS.VACCINATIONS.BATCH },
+					6: { cellWidth: PDF_COLUMN_WIDTHS.VACCINATIONS.LOCATION },
+					7: { cellWidth: PDF_COLUMN_WIDTHS.VACCINATIONS.NOTES },
 				},
-				margin: { top: 20, right: 14, bottom: 20, left: 14 },
+				margin: {
+					top: PDF_CONFIG.MARGINS.TOP,
+					right: PDF_CONFIG.MARGINS.RIGHT,
+					bottom: PDF_CONFIG.MARGINS.BOTTOM,
+					left: PDF_CONFIG.MARGINS.LEFT,
+				},
 			});
 
 			// Rodapé
@@ -502,12 +495,16 @@ export function usePdfExport() {
 				for (let i = 1; i <= pageCount; i++) {
 					doc.setPage(i);
 					const pageHeight = doc.internal.pageSize.height;
-					doc.setFontSize(10);
-					doc.setFont("helvetica", "normal");
-					doc.text(`Página ${i} de ${pageCount}`, 14, pageHeight - 10);
+					doc.setFontSize(PDF_CONFIG.FONT_SIZES.SMALL);
+					doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.NORMAL);
 					doc.text(
-						"Sistema de Vacinação",
-						doc.internal.pageSize.width - 14,
+						`${PDF_TEXTS.PAGE} ${i} ${PDF_TEXTS.OF} ${pageCount}`,
+						PDF_CONFIG.MARGINS.LEFT,
+						pageHeight - 10
+					);
+					doc.text(
+						PDF_TEXTS.SYSTEM_NAME,
+						doc.internal.pageSize.width - PDF_CONFIG.MARGINS.RIGHT,
 						pageHeight - 10,
 						{ align: "right" }
 					);
@@ -522,32 +519,31 @@ export function usePdfExport() {
 		},
 		[]
 	);
-
 	const exportVaccinationToPdf = useCallback(
 		(vaccination: VaccinationRecordWithDetails) => {
 			const doc = new jsPDF({
 				orientation: "portrait",
-				unit: "mm",
-				format: "a4",
+				unit: PDF_CONFIG.DEFAULT_UNIT,
+				format: PDF_CONFIG.DEFAULT_FORMAT,
 			});
 
-			doc.setFont("helvetica");
-			let currentY = 20;
+			doc.setFont(PDF_CONFIG.FONT_FAMILY);
+			let currentY = PDF_CONFIG.MARGINS.TOP;
 
 			// Título
-			doc.setFontSize(20);
-			doc.setFont("helvetica", "bold");
-			doc.text("Comprovante de Vacinação", 14, currentY);
+			doc.setFontSize(PDF_CONFIG.FONT_SIZES.TITLE);
+			doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.BOLD);
+			doc.text("Comprovante de Vacinação", PDF_CONFIG.MARGINS.LEFT, currentY);
 			currentY += 20;
 
 			// Informações do paciente
-			doc.setFontSize(14);
-			doc.setFont("helvetica", "bold");
-			doc.text("DADOS DO PACIENTE", 14, currentY);
+			doc.setFontSize(PDF_CONFIG.FONT_SIZES.SUBTITLE);
+			doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.BOLD);
+			doc.text("DADOS DO PACIENTE", PDF_CONFIG.MARGINS.LEFT, currentY);
 			currentY += 10;
 
-			doc.setFontSize(12);
-			doc.setFont("helvetica", "normal");
+			doc.setFontSize(PDF_CONFIG.FONT_SIZES.NORMAL);
+			doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.NORMAL);
 
 			const patientInfo = [
 				["Nome:", vaccination.patient.full_name],
@@ -555,9 +551,9 @@ export function usePdfExport() {
 			];
 
 			patientInfo.forEach(([label, value]) => {
-				doc.setFont("helvetica", "bold");
-				doc.text(label, 14, currentY);
-				doc.setFont("helvetica", "normal");
+				doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.BOLD);
+				doc.text(label, PDF_CONFIG.MARGINS.LEFT, currentY);
+				doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.NORMAL);
 				doc.text(value, 50, currentY);
 				currentY += 8;
 			});
@@ -565,30 +561,27 @@ export function usePdfExport() {
 			currentY += 10;
 
 			// Informações da vacinação
-			doc.setFontSize(14);
-			doc.setFont("helvetica", "bold");
-			doc.text("DADOS DA VACINAÇÃO", 14, currentY);
+			doc.setFontSize(PDF_CONFIG.FONT_SIZES.SUBTITLE);
+			doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.BOLD);
+			doc.text("DADOS DA VACINAÇÃO", PDF_CONFIG.MARGINS.LEFT, currentY);
 			currentY += 10;
 
-			doc.setFontSize(12);
-			doc.setFont("helvetica", "normal");
+			doc.setFontSize(PDF_CONFIG.FONT_SIZES.NORMAL);
+			doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.NORMAL);
 
 			const vaccinationInfo = [
 				["Vacina:", vaccination.vaccine.type],
 				["Fabricante:", vaccination.vaccine.manufacturer],
-				[
-					"Data da Dose:",
-					new Date(vaccination.dose_date).toLocaleDateString("pt-BR"),
-				],
+				["Data da Dose:", formatDateToBrazilian(vaccination.dose_date)],
 				["Lote:", vaccination.batch_number],
 				["Local:", vaccination.location],
-				["Observações:", vaccination.notes || "Nenhuma observação"],
+				["Observações:", vaccination.notes || PDF_TEXTS.NO_OBSERVATIONS],
 			];
 
 			vaccinationInfo.forEach(([label, value]) => {
-				doc.setFont("helvetica", "bold");
-				doc.text(label, 14, currentY);
-				doc.setFont("helvetica", "normal");
+				doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.BOLD);
+				doc.text(label, PDF_CONFIG.MARGINS.LEFT, currentY);
+				doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.NORMAL);
 
 				// Quebrar texto longo em múltiplas linhas
 				const maxWidth = 140;
@@ -599,12 +592,12 @@ export function usePdfExport() {
 
 			// Data de geração
 			currentY += 20;
-			doc.setFontSize(10);
+			doc.setFontSize(PDF_CONFIG.FONT_SIZES.SMALL);
 			doc.text(
-				`Documento gerado em: ${new Date().toLocaleDateString(
-					"pt-BR"
-				)} às ${new Date().toLocaleTimeString("pt-BR")}`,
-				14,
+				`Documento gerado em: ${new Date().toLocaleDateString("pt-BR")} ${
+					PDF_TEXTS.AT_TIME
+				} ${new Date().toLocaleTimeString("pt-BR")}`,
+				PDF_CONFIG.MARGINS.LEFT,
 				currentY
 			);
 
@@ -617,7 +610,6 @@ export function usePdfExport() {
 		},
 		[]
 	);
-
 	const exportDashboardToPdf = useCallback(
 		async (
 			dashboardData: DashboardData,
@@ -639,28 +631,28 @@ export function usePdfExport() {
 			try {
 				const doc = new jsPDF({
 					orientation,
-					unit: "mm",
-					format: "a4",
+					unit: PDF_CONFIG.DEFAULT_UNIT,
+					format: PDF_CONFIG.DEFAULT_FORMAT,
 				});
 
-				doc.setFont("helvetica");
-				let currentY = 20;
+				doc.setFont(PDF_CONFIG.FONT_FAMILY);
+				let currentY = PDF_CONFIG.MARGINS.TOP;
 				const pageWidth = doc.internal.pageSize.width;
 				const pageHeight = doc.internal.pageSize.height;
 
 				// Cabeçalho
 				if (includeHeader) {
 					doc.setFontSize(16);
-					doc.setFont("helvetica", "bold");
+					doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.BOLD);
 					doc.text(title, pageWidth / 2, currentY, { align: "center" });
 					currentY += 10;
 
-					doc.setFontSize(10);
-					doc.setFont("helvetica", "normal");
+					doc.setFontSize(PDF_CONFIG.FONT_SIZES.SMALL);
+					doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.NORMAL);
 					doc.text(
-						`Gerado em: ${new Date().toLocaleDateString(
+						`${PDF_TEXTS.GENERATED_AT} ${new Date().toLocaleDateString(
 							"pt-BR"
-						)} às ${new Date().toLocaleTimeString("pt-BR")}`,
+						)} ${PDF_TEXTS.AT_TIME} ${new Date().toLocaleTimeString("pt-BR")}`,
 						pageWidth / 2,
 						currentY,
 						{ align: "center" }
@@ -669,34 +661,42 @@ export function usePdfExport() {
 
 					// Informações dos filtros aplicados
 					if (filters) {
-						doc.setFontSize(12);
-						doc.setFont("helvetica", "bold");
-						doc.text("Filtros Aplicados:", 14, currentY);
+						doc.setFontSize(PDF_CONFIG.FONT_SIZES.NORMAL);
+						doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.BOLD);
+						doc.text("Filtros Aplicados:", PDF_CONFIG.MARGINS.LEFT, currentY);
 						currentY += 8;
 
-						doc.setFontSize(10);
-						doc.setFont("helvetica", "normal");
+						doc.setFontSize(PDF_CONFIG.FONT_SIZES.SMALL);
+						doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.NORMAL);
 
 						if (filters.period) {
-							doc.text(`• Período: ${filters.period}`, 14, currentY);
+							doc.text(
+								`• Período: ${filters.period}`,
+								PDF_CONFIG.MARGINS.LEFT,
+								currentY
+							);
 							currentY += 6;
 						}
 						if (filters.vaccineType) {
 							doc.text(
 								`• Tipo de Vacina: ${filters.vaccineType}`,
-								14,
+								PDF_CONFIG.MARGINS.LEFT,
 								currentY
 							);
 							currentY += 6;
 						}
 						if (filters.ageGroup) {
-							doc.text(`• Faixa Etária: ${filters.ageGroup}`, 14, currentY);
+							doc.text(
+								`• Faixa Etária: ${filters.ageGroup}`,
+								PDF_CONFIG.MARGINS.LEFT,
+								currentY
+							);
 							currentY += 6;
 						}
 						if (filters.patientId) {
 							doc.text(
 								`• Paciente Específico: ID ${filters.patientId}`,
-								14,
+								PDF_CONFIG.MARGINS.LEFT,
 								currentY
 							);
 							currentY += 6;
@@ -706,16 +706,22 @@ export function usePdfExport() {
 				}
 
 				// Estatísticas Gerais
-				doc.setFontSize(14);
-				doc.setFont("helvetica", "bold");
-				doc.text("ESTATÍSTICAS GERAIS", 14, currentY);
+				doc.setFontSize(PDF_CONFIG.FONT_SIZES.SUBTITLE);
+				doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.BOLD);
+				doc.text("ESTATÍSTICAS GERAIS", PDF_CONFIG.MARGINS.LEFT, currentY);
 				currentY += 10;
 
 				const statsData = [
-					["Total de Pacientes", dashboardData.stats.totalPatients.toString()],
-					["Total de Vacinas", dashboardData.stats.totalVaccines.toString()],
 					[
-						"Total de Vacinações",
+						PDF_TEXTS.TOTAL_PATIENTS,
+						dashboardData.stats.totalPatients.toString(),
+					],
+					[
+						PDF_TEXTS.TOTAL_VACCINES,
+						dashboardData.stats.totalVaccines.toString(),
+					],
+					[
+						PDF_TEXTS.TOTAL_VACCINATIONS,
 						dashboardData.stats.totalVaccinations.toString(),
 					],
 				];
@@ -723,11 +729,11 @@ export function usePdfExport() {
 					body: statsData,
 					startY: currentY,
 					styles: {
-						fontSize: 10,
-						cellPadding: 4,
+						fontSize: PDF_CONFIG.FONT_SIZES.SMALL,
+						cellPadding: PDF_CONFIG.TABLE.HEAD_CELL_PADDING,
 					},
 					columnStyles: {
-						0: { fontStyle: "bold", cellWidth: 60 },
+						0: { fontStyle: PDF_CONFIG.FONT_STYLES.BOLD, cellWidth: 60 },
 						1: { cellWidth: 40, halign: "center" },
 					},
 					theme: "grid",
@@ -737,9 +743,9 @@ export function usePdfExport() {
 
 				// Indicadores de Saúde
 				if (dashboardData.healthIndicators) {
-					doc.setFontSize(14);
-					doc.setFont("helvetica", "bold");
-					doc.text("INDICADORES DE SAÚDE", 14, currentY);
+					doc.setFontSize(PDF_CONFIG.FONT_SIZES.SUBTITLE);
+					doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.BOLD);
+					doc.text("INDICADORES DE SAÚDE", PDF_CONFIG.MARGINS.LEFT, currentY);
 					currentY += 10;
 
 					const healthData = [
@@ -778,11 +784,11 @@ export function usePdfExport() {
 						body: healthData,
 						startY: currentY,
 						styles: {
-							fontSize: 10,
-							cellPadding: 4,
+							fontSize: PDF_CONFIG.FONT_SIZES.SMALL,
+							cellPadding: PDF_CONFIG.TABLE.HEAD_CELL_PADDING,
 						},
 						columnStyles: {
-							0: { fontStyle: "bold", cellWidth: 80 },
+							0: { fontStyle: PDF_CONFIG.FONT_STYLES.BOLD, cellWidth: 80 },
 							1: { cellWidth: 40, halign: "center" },
 						},
 						theme: "grid",
@@ -795,13 +801,11 @@ export function usePdfExport() {
 				if (currentY > pageHeight - 60) {
 					doc.addPage();
 					currentY = 20;
-				}
-
-				// Vacinações por Tipo
+				} // Vacinações por Tipo
 				if (dashboardData.vaccinationsByType.length > 0) {
-					doc.setFontSize(14);
-					doc.setFont("helvetica", "bold");
-					doc.text("VACINAÇÕES POR TIPO", 14, currentY);
+					doc.setFontSize(PDF_CONFIG.FONT_SIZES.SUBTITLE);
+					doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.BOLD);
+					doc.text("VACINAÇÕES POR TIPO", PDF_CONFIG.MARGINS.LEFT, currentY);
 					currentY += 10;
 
 					const typeData = dashboardData.vaccinationsByType.map((item) => [
@@ -817,16 +821,16 @@ export function usePdfExport() {
 						body: typeData,
 						startY: currentY,
 						styles: {
-							fontSize: 10,
-							cellPadding: 3,
+							fontSize: PDF_CONFIG.FONT_SIZES.SMALL,
+							cellPadding: PDF_CONFIG.TABLE.CELL_PADDING,
 						},
 						headStyles: {
-							fillColor: [79, 70, 229],
-							textColor: 255,
-							fontStyle: "bold",
+							fillColor: PDF_CONFIG.COLORS.PRIMARY,
+							textColor: PDF_CONFIG.COLORS.WHITE,
+							fontStyle: PDF_CONFIG.FONT_STYLES.BOLD,
 						},
 						alternateRowStyles: {
-							fillColor: [245, 245, 245],
+							fillColor: PDF_CONFIG.COLORS.ALTERNATE_ROW,
 						},
 						columnStyles: {
 							0: { cellWidth: 80 },
@@ -841,14 +845,18 @@ export function usePdfExport() {
 				// Verificar se precisa de nova página
 				if (currentY > pageHeight - 60) {
 					doc.addPage();
-					currentY = 20;
+					currentY = PDF_CONFIG.MARGINS.TOP;
 				}
 
 				// Pacientes por Faixa Etária
 				if (dashboardData.patientsByAge.length > 0) {
-					doc.setFontSize(14);
-					doc.setFont("helvetica", "bold");
-					doc.text("PACIENTES POR FAIXA ETÁRIA", 14, currentY);
+					doc.setFontSize(PDF_CONFIG.FONT_SIZES.SUBTITLE);
+					doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.BOLD);
+					doc.text(
+						"PACIENTES POR FAIXA ETÁRIA",
+						PDF_CONFIG.MARGINS.LEFT,
+						currentY
+					);
 					currentY += 10;
 
 					const ageData = dashboardData.patientsByAge.map((item) => [
@@ -864,16 +872,16 @@ export function usePdfExport() {
 						body: ageData,
 						startY: currentY,
 						styles: {
-							fontSize: 10,
-							cellPadding: 3,
+							fontSize: PDF_CONFIG.FONT_SIZES.SMALL,
+							cellPadding: PDF_CONFIG.TABLE.CELL_PADDING,
 						},
 						headStyles: {
-							fillColor: [79, 70, 229],
-							textColor: 255,
-							fontStyle: "bold",
+							fillColor: PDF_CONFIG.COLORS.PRIMARY,
+							textColor: PDF_CONFIG.COLORS.WHITE,
+							fontStyle: PDF_CONFIG.FONT_STYLES.BOLD,
 						},
 						alternateRowStyles: {
-							fillColor: [245, 245, 245],
+							fillColor: PDF_CONFIG.COLORS.ALTERNATE_ROW,
 						},
 						columnStyles: {
 							0: { cellWidth: 60 },
@@ -883,16 +891,14 @@ export function usePdfExport() {
 					});
 
 					currentY = (doc as jsPDFWithAutoTable).lastAutoTable.finalY + 15;
-				}
-
-				// Nova página para dados mensais
+				} // Nova página para dados mensais
 				if (dashboardData.vaccinationsByMonth.length > 0) {
 					doc.addPage();
-					currentY = 20;
+					currentY = PDF_CONFIG.MARGINS.TOP;
 
-					doc.setFontSize(14);
-					doc.setFont("helvetica", "bold");
-					doc.text("VACINAÇÕES POR MÊS", 14, currentY);
+					doc.setFontSize(PDF_CONFIG.FONT_SIZES.SUBTITLE);
+					doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.BOLD);
+					doc.text("VACINAÇÕES POR MÊS", PDF_CONFIG.MARGINS.LEFT, currentY);
 					currentY += 10;
 
 					const monthData = dashboardData.vaccinationsByMonth.map((item) => [
@@ -904,16 +910,16 @@ export function usePdfExport() {
 						body: monthData,
 						startY: currentY,
 						styles: {
-							fontSize: 10,
-							cellPadding: 3,
+							fontSize: PDF_CONFIG.FONT_SIZES.SMALL,
+							cellPadding: PDF_CONFIG.TABLE.CELL_PADDING,
 						},
 						headStyles: {
-							fillColor: [79, 70, 229],
-							textColor: 255,
-							fontStyle: "bold",
+							fillColor: PDF_CONFIG.COLORS.PRIMARY,
+							textColor: PDF_CONFIG.COLORS.WHITE,
+							fontStyle: PDF_CONFIG.FONT_STYLES.BOLD,
 						},
 						alternateRowStyles: {
-							fillColor: [245, 245, 245],
+							fillColor: PDF_CONFIG.COLORS.ALTERNATE_ROW,
 						},
 						columnStyles: {
 							0: { cellWidth: 80 },
@@ -928,12 +934,12 @@ export function usePdfExport() {
 				if (dashboardData.locationDistribution.length > 0) {
 					if (currentY > pageHeight - 100) {
 						doc.addPage();
-						currentY = 20;
+						currentY = PDF_CONFIG.MARGINS.TOP;
 					}
 
-					doc.setFontSize(14);
-					doc.setFont("helvetica", "bold");
-					doc.text("DISTRIBUIÇÃO POR LOCAL", 14, currentY);
+					doc.setFontSize(PDF_CONFIG.FONT_SIZES.SUBTITLE);
+					doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.BOLD);
+					doc.text("DISTRIBUIÇÃO POR LOCAL", PDF_CONFIG.MARGINS.LEFT, currentY);
 					currentY += 10;
 
 					const locationData = dashboardData.locationDistribution.map(
@@ -952,16 +958,16 @@ export function usePdfExport() {
 						body: locationData,
 						startY: currentY,
 						styles: {
-							fontSize: 10,
-							cellPadding: 3,
+							fontSize: PDF_CONFIG.FONT_SIZES.SMALL,
+							cellPadding: PDF_CONFIG.TABLE.CELL_PADDING,
 						},
 						headStyles: {
-							fillColor: [79, 70, 229],
-							textColor: 255,
-							fontStyle: "bold",
+							fillColor: PDF_CONFIG.COLORS.PRIMARY,
+							textColor: PDF_CONFIG.COLORS.WHITE,
+							fontStyle: PDF_CONFIG.FONT_STYLES.BOLD,
 						},
 						alternateRowStyles: {
-							fillColor: [245, 245, 245],
+							fillColor: PDF_CONFIG.COLORS.ALTERNATE_ROW,
 						},
 						columnStyles: {
 							0: { cellWidth: 80 },
@@ -976,12 +982,16 @@ export function usePdfExport() {
 					const pageCount = doc.getNumberOfPages();
 					for (let i = 1; i <= pageCount; i++) {
 						doc.setPage(i);
-						doc.setFontSize(8);
-						doc.setFont("helvetica", "normal");
-						doc.text(`Página ${i} de ${pageCount}`, 14, pageHeight - 10);
+						doc.setFontSize(PDF_CONFIG.FONT_SIZES.TINY);
+						doc.setFont(PDF_CONFIG.FONT_FAMILY, PDF_CONFIG.FONT_STYLES.NORMAL);
+						doc.text(
+							`${PDF_TEXTS.PAGE} ${i} ${PDF_TEXTS.OF} ${pageCount}`,
+							PDF_CONFIG.MARGINS.LEFT,
+							pageHeight - 10
+						);
 						doc.text(
 							"Sistema de Vacinação - Relatório Dashboard",
-							pageWidth - 14,
+							pageWidth - PDF_CONFIG.MARGINS.RIGHT,
 							pageHeight - 10,
 							{ align: "right" }
 						);
