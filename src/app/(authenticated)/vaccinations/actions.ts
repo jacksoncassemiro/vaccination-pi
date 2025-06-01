@@ -437,17 +437,22 @@ export async function getVaccinationsByVaccineType() {
 	}
 	const { data, error } = await supabase
 		.from("vaccination_records")
-		.select(`
+		.select(
+			`
 			vaccine_catalog!inner(type, manufacturer),
 			patients!inner(user_id)
-		`)
+		`
+		)
 		.eq("patients.user_id", user.id);
 
 	if (error) {
 		throw new Error(`Erro ao buscar vacinações por tipo: ${error.message}`);
-	}	// Agrupar por tipo de vacina
+	} // Agrupar por tipo de vacina
 	const grouped = (data || []).reduce((acc, record: DatabaseRow) => {
-		const vaccine = record.vaccine_catalog as { type?: string; manufacturer?: string };
+		const vaccine = record.vaccine_catalog as {
+			type?: string;
+			manufacturer?: string;
+		};
 		if (vaccine && vaccine.type && vaccine.manufacturer) {
 			const vaccineType = vaccine.type;
 			const key = `${vaccineType} - ${vaccine.manufacturer}`;
@@ -494,17 +499,19 @@ export async function getVaccinationsByMonth() {
 	oneYearAgo.setFullYear(oneYearAgo.getFullYear() - 1);
 	const { data, error } = await supabase
 		.from("vaccination_records")
-		.select(`
+		.select(
+			`
 			dose_date,
 			patients!inner(user_id)
-		`)
+		`
+		)
 		.eq("patients.user_id", user.id)
 		.gte("dose_date", oneYearAgo.toISOString().split("T")[0])
 		.order("dose_date");
 
 	if (error) {
 		throw new Error(`Erro ao buscar vacinações por mês: ${error.message}`);
-	}	// Agrupar por mês
+	} // Agrupar por mês
 	const grouped = (data || []).reduce((acc, record: DatabaseRow) => {
 		const date = new Date(record.dose_date as string);
 		const monthKey = `${date.getFullYear()}-${String(
@@ -552,7 +559,7 @@ export async function getPatientsByAgeGroup() {
 		throw new Error(
 			`Erro ao buscar pacientes por faixa etária: ${error.message}`
 		);
-	}	// Calcular idades e agrupar
+	} // Calcular idades e agrupar
 	const currentYear = new Date().getFullYear();
 	const ageGroups = {
 		"0-17": 0,
