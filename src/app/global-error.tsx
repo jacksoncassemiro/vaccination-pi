@@ -63,22 +63,23 @@ export default function GlobalError({
 							Ocorreu um erro crítico na aplicação. Nossa equipe foi notificada
 							automaticamente. Tente recarregar a página.
 						</p>
-						{process.env.NODE_ENV === "development" && (
-							<p
-								style={{
-									color: "#e03131",
-									fontSize: "0.875rem",
-									fontFamily: "monospace",
-									backgroundColor: "#f8f9fa",
-									padding: "1rem",
-									borderRadius: "4px",
-									marginBottom: "2rem",
-									textAlign: "left",
-								}}
-							>
-								{error.message}
-							</p>
-						)}
+						{process.env.NODE_ENV === "development" ||
+							(process.env.NEXT_PUBLIC_VERCEL_ENV === "development" && (
+								<p
+									style={{
+										color: "#e03131",
+										fontSize: "0.875rem",
+										fontFamily: "monospace",
+										backgroundColor: "#f8f9fa",
+										padding: "1rem",
+										borderRadius: "4px",
+										marginBottom: "2rem",
+										textAlign: "left",
+									}}
+								>
+									{error.message}
+								</p>
+							))}
 						<button
 							onClick={() => reset()}
 							style={{
