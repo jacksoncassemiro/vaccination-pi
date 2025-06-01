@@ -27,16 +27,17 @@ export default function Error({
 					Ocorreu um erro inesperado. Nossa equipe foi notificada e está
 					trabalhando para resolver o problema.
 				</Text>
-				{process.env.NODE_ENV === "development" && (
-					<Text
-						size="sm"
-						c="red"
-						ta="center"
-						style={{ fontFamily: "monospace" }}
-					>
-						{error.message}
-					</Text>
-				)}
+				{process.env.NODE_ENV === "development" ||
+					(process.env.NEXT_PUBLIC_VERCEL_ENV === "development" && (
+						<Text
+							size="sm"
+							c="red"
+							ta="center"
+							style={{ fontFamily: "monospace" }}
+						>
+							{error.message}
+						</Text>
+					))}
 				<Button
 					leftSection={<FaRedo size={16} />}
 					onClick={() => reset()}
