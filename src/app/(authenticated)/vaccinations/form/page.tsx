@@ -77,10 +77,14 @@ export default function VaccinationFormPage() {
 				const formData = new FormData();
 				formData.append("patient_id", values.patient_id);
 				formData.append("vaccine_id", values.vaccine_id);
-				formData.append(
-					"dose_date",
-					values.dose_date.toISOString().split("T")[0]
-				);
+
+				// Garantir que dose_date seja um objeto Date válido
+				const doseDate =
+					values.dose_date instanceof Date
+						? values.dose_date
+						: new Date(values.dose_date);
+
+				formData.append("dose_date", doseDate.toISOString().split("T")[0]);
 				formData.append("batch_number", values.batch_number);
 				formData.append("location", values.location);
 				if (values.notes) {
