@@ -1,21 +1,27 @@
 "use server";
 
+import { getBaseUrl } from "@/utils/getBaseUrl";
 import { createClient } from "@/utils/supabase/server";
 import { redirect } from "next/navigation";
 
 export async function signInWithGoogle() {
 	const supabase = await createClient();
 
-	console.log(process.env.NEXT_PUBLIC_VERCEL_URL);
+	const baseUrl = getBaseUrl();
+
+	// Log detalhado para debug
+	console.log("=== DEBUG VARIAVEIS DE AMBIENTE ===");
+	console.log("NODE_ENV:", process.env.NODE_ENV);
+	console.log("VERCEL_URL:", process.env.VERCEL_URL);
+	console.log("NEXT_PUBLIC_SITE_URL:", process.env.NEXT_PUBLIC_SITE_URL);
+	console.log("NEXT_PUBLIC_BASE_URL:", process.env.NEXT_PUBLIC_BASE_URL);
+	console.log("Base URL final:", baseUrl);
+	console.log("===================================");
 
 	const { data, error } = await supabase.auth.signInWithOAuth({
 		provider: "google",
 		options: {
-			redirectTo: `${
-				process.env.NEXT_PUBLIC_VERCEL_URL ||
-				process.env.NEXT_PUBLIC_BASE_URL ||
-				"http://localhost:3000"
-			}/auth/callback`,
+			redirectTo: `${baseUrl}/auth/callback`,
 		},
 	});
 
