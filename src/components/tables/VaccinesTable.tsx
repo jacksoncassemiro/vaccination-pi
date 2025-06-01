@@ -106,7 +106,7 @@ export function VaccinesTable({
 									</Table.Td>
 									<Table.Td>
 										<Text>{vaccine.manufacturer}</Text>
-									</Table.Td>{" "}
+									</Table.Td>
 									<Table.Td>
 										<Text size="sm" c="dimmed">
 											{formatDateToBrazilian(vaccine.created_at)}
