@@ -22,11 +22,11 @@ Esta seção descreve em detalhes cada uma das funcionalidades principais do sis
 ## Gerenciamento de Vacinas
 
 - **Cadastro de Vacinas**:
-  - Campos: Nome da Vacina, Fabricante, Tipo (ex: Atenuada, Inativada, Subunidade).
+  - Campos: Nome da Vacina, Fabricante.
   - Validações: Campos obrigatórios.
 - **Visualização de Vacinas**:
   - Listagem paginada de todas as vacinas cadastradas.
-  - Campos exibidos: Nome da Vacina, Fabricante, Tipo.
+  - Campos exibidos: Nome da Vacina, Fabricante.
   - Opção de busca por nome da vacina.
 - **Edição de Vacinas**:
   - Permite alterar todas as informações da vacina.
